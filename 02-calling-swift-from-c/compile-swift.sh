@@ -13,6 +13,12 @@ SWIFTC="${SWIFTC:-/Volumes/Crucial-2TB/Developer/build/Ninja-ReleaseAssert/swift
 BUILD_DIR="${BUILD_DIR:-build}"
 SWIFT_DIR="/Volumes/Crucial-2TB/Developer/build/Ninja-ReleaseAssert/swift-macosx-arm64"
 
+# Check if running in Docker (different Swift path)
+if [ -f "/swift-host/bin/swiftc" ]; then
+    SWIFTC="/swift-host/bin/swiftc"
+    SWIFT_DIR="/swift-host"
+fi
+
 # Create build directory
 mkdir -p "$BUILD_DIR"
 

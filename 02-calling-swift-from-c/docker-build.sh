@@ -19,5 +19,6 @@ docker run --rm \
     --name "$CONTAINER_NAME" \
     -v "$(pwd):/workspace" \
     -w /workspace \
+    -v /Volumes/Crucial-2TB/Developer/build/Ninja-ReleaseAssert/swift-macosx-arm64:/swift-host:ro \
     "$IMAGE_NAME" \
-    make -f GNUmakefile HOST_SWIFT=1 SWIFTC_HOST="/Volumes/Crucial-2TB/Developer/build/Ninja-ReleaseAssert/swift-macosx-arm64/bin/swiftc"
+    make -f GNUmakefile HOST_SWIFT=1 SWIFTC_HOST="/swift-host/bin/swiftc"

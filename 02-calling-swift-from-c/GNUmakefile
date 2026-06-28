@@ -193,7 +193,7 @@ $(ELF): $(O_FILES) $(SWIFT_OBJ) $(BUILD_DIR)/$(LD_SCRIPT)
 	$(V)$(LD) -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) -Map $(BUILD_DIR)/$(TARGET).map --no-check-sections \
 		-o $@ $(O_FILES) \
 		$(SWIFT_OBJ) \
-		-L$(SWIFT_LIBDIR)/$(SWIFT_TARGET) -lswiftEmbeddedPlatformPOSIX -lswiftExclusivitySingleThreaded -lswiftUnicodeDataTables \
+		-L$(CURDIR)/swift-libs/mipsel-none-none-elf -lswiftEmbeddedPlatformPOSIX -lswiftExclusivitySingleThreaded -lswiftUnicodeDataTables \
 		-L/usr/lib/n64/nusys $(NUAUDIOLIB) -lnusys  -ln_audio \
 		-L/usr/lib/n64 -lultra_rom -lnustd \
 		-L$(N64_LIBGCCDIR) -lgcc

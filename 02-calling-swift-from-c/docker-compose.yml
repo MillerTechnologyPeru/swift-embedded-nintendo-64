@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: make -f GNUmakefile HOST_SWIFT=1 SWIFTC_HOST="/Volumes/Crucial-2TB/Developer/build/Ninja-ReleaseAssert/swift-macosx-arm64/bin/swiftc"
+    command: make -f GNUmakefile HOST_SWIFT=1 SWIFTC_HOST="/swift-host/bin/swiftc"
     platform: linux/amd64
     stdin_open: true
     tty: true
@@ -13,3 +13,4 @@ services:
     environment:
       - HOST_SWIFT=1
       - SWIFTC_HOST=/swift-host/bin/swiftc
+      - SWIFT_LIBS=/workspace/swift-libs/mipsel-none-none-elf
