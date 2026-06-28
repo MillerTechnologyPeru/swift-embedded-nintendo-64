@@ -71,7 +71,7 @@ OBJDUMP   := mips-n64-objdump
 OBJCOPY   := mips-n64-objcopy
 
 # Swift
-SWIFT_TARGET := mipsel-none-none-elf
+SWIFT_TARGET := mips-none-none-elf
 SWIFT_LIBDIR := /Volumes/Crucial-2TB/Developer/build/Ninja-ReleaseAssert/swift-macosx-arm64/lib/swift/embedded
 SWIFT_SDK := $(SWIFT_LIBDIR)/$(SWIFT_TARGET)
 
@@ -162,17 +162,10 @@ $(BUILD_DIR)/%.o: $(BUILD_DIR)/%.c
 	$(call print,Compiling:,$<,$@)
 	$(V)$(CC) -c $(CFLAGS) -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
 
-# Compile Swift
-# If HOST_SWIFT is set, use external script for Swift compilation
-ifdef HOST_SWIFT
+# Compile Swift - always on host
 $(SWIFT_OBJ): $(SWIFT_FILES)
 	$(call print,Compiling Swift (host):,$<,$@)
 	$(V)bash $(CURDIR)/compile-swift.sh
-else
-$(SWIFT_OBJ): $(SWIFT_FILES)
-	$(call print,Compiling Swift:,$<,$@)
-	$(V)$(SWIFTC) $(SWIFTCFLAGS) -o $@ $^
-endif
 
 # Assemble assembly code
 $(BUILD_DIR)/%.o: %.s
@@ -188,15 +181,28 @@ $(BOOT_OBJ): $(BOOT)
 	$(V)$(OBJCOPY) -I binary -B mips -O elf32-bigmips $< $@
 
 # Link final ELF file
+# If SWIFT_OBJ_EXIST is set, assume Swift object is already compiled
+ifdef SWIFT_OBJ_EXIST
+$(ELF): $(O_FILES) $(BUILD_DIR)/$(LD_SCRIPT)
+	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
+	$(V)$(LD) -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) -Map $(BUILD_DIR)/$(TARGET).map --no-check-sections \
+		-o $@ $(O_FILES) \
+		$(SWIFT_OBJ) \
+		-L$(CURDIR)/swift-libs/mips-none-none-elf -lswiftEmbeddedPlatformPOSIX -lswiftExclusivitySingleThreaded -lswiftUnicodeDataTables \
+		-L/usr/lib/n64/nusys $(NUAUDIOLIB) -lnusys  -ln_audio \
+		-L/usr/lib/n64 -lultra_rom -lnustd \
+		-L$(N64_LIBGCCDIR) -lgcc
+else
 $(ELF): $(O_FILES) $(SWIFT_OBJ) $(BUILD_DIR)/$(LD_SCRIPT)
 	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
 	$(V)$(LD) -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) -Map $(BUILD_DIR)/$(TARGET).map --no-check-sections \
 		-o $@ $(O_FILES) \
 		$(SWIFT_OBJ) \
-		-L$(CURDIR)/swift-libs/mipsel-none-none-elf -lswiftEmbeddedPlatformPOSIX -lswiftExclusivitySingleThreaded -lswiftUnicodeDataTables \
+		-L$(CURDIR)/swift-libs/mips-none-none-elf -lswiftEmbeddedPlatformPOSIX -lswiftExclusivitySingleThreaded -lswiftUnicodeDataTables \
 		-L/usr/lib/n64/nusys $(NUAUDIOLIB) -lnusys  -ln_audio \
 		-L/usr/lib/n64 -lultra_rom -lnustd \
 		-L$(N64_LIBGCCDIR) -lgcc
+endif
 
 # Build ROM
 $(ROM): $(ELF)
