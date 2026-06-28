@@ -1,6 +1,4 @@
-# check=skip=FromPlatformFlagConstDisallowed
-
-FROM --platform=linux/amd64 debian:bookworm-slim@sha256:7e490910eea2861b9664577a96b54ce68ea3e02ce7f51d89cb0103a6f9c386e0
+FROM --platform=linux/amd64 debian:bookworm-slim
 
 ENV DEBIAN_FRONTEND="noninteractive"
 

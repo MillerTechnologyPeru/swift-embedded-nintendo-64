@@ -13,7 +13,7 @@ SECTIONS
       build/asm/entry.o(.start);
       /usr/lib/n64/nusys/nusys_rom.o(.text);
       build/src*.o(.text);
-      build/swiftlib.o(.text);
+       build/swiftlib.o(.text);
       */libultra_rom.a:*.o(.text);
       */libnustd.a:*.o(.text);
       */libnusys.a:*.o(.text);
@@ -33,7 +33,7 @@ SECTIONS
       /usr/lib/n64/PR/gspS2DEX2.fifo.o(.text);
       /usr/lib/n64/nusys/nusys_rom.o(.data*);
       build/src*.o(.data*);
-      build/swiftlib.o(.data*);
+       build/swiftlib.o(.data*);
       */libultra_rom.a:*.o(.data*);
       */libnustd.a:*.o(.data*);
       */libnusys.a:*.o(.data*);
@@ -52,7 +52,7 @@ SECTIONS
       /usr/lib/n64/PR/gspS2DEX2.fifo.o(.data*);
       /usr/lib/n64/nusys/nusys_rom.o(.*rodata*);
       build/src*.o(.*rodata*);
-      build/swiftlib.o(.rodata*);
+       build/swiftlib.o(.rodata*);
       */libultra_rom.a:*.o(.*rodata*);
       */libnustd.a:*.o(*.rodata*);
       */libnusys.a:*.o(.*rodata*);
@@ -69,7 +69,7 @@ SECTIONS
       /usr/lib/n64/nusys/nusys_rom.o(.scommon);
       /usr/lib/n64/nusys/nusys_rom.o(.*bss*);
       build/src*.o(.*bss*);
-      build/swiftlib.o(.bss*);
+       build/swiftlib.o(.bss*);
       */libultra_rom.a:*.o(COMMON);
       */libultra_rom.a:*.o(.scommon);
       */libultra_rom.a:*.o(.*bss*);

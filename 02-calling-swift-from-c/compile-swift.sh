@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Swift compilation script - runs on host system
-# Called from Docker container or directly
+# Emits LLVM IR from Swift, then compiles with llc using non-abicalls MIPS
 
 set -e
 
@@ -10,43 +10,44 @@ cd "$SCRIPT_DIR"
 
 # Build Swift object file using host compiler
 SWIFTC="${SWIFTC:-/Volumes/Crucial-2TB/Developer/build/Ninja-ReleaseAssert/swift-macosx-arm64/bin/swiftc}"
+LLC="/Volumes/Crucial-2TB/Developer/build/Ninja-ReleaseAssert/llvm-macosx-arm64/bin/llc"
 BUILD_DIR="${BUILD_DIR:-build}"
-SWIFT_DIR="/Volumes/Crucial-2TB/Developer/build/Ninja-ReleaseAssert/swift-macosx-arm64"
-
-# Check if running in Docker (different Swift path)
-if [ -f "/swift-host/bin/swiftc" ]; then
-    SWIFTC="/swift-host/bin/swiftc"
-    SWIFT_DIR="/swift-host"
-fi
 
 # Create build directory
 mkdir -p "$BUILD_DIR"
 
 echo "Compiling Swift code with host compiler..."
 echo "Swift compiler: $SWIFTC"
+echo "LLVM llc: $LLC"
 echo "Build directory: $BUILD_DIR"
 echo "Target: mips-none-none-elf"
 
-# Try to compile with embedded Swift mode + additional flags
+# Step 1: Emit LLVM IR from Swift
+echo "Step 1: Emitting LLVM IR..."
 "$SWIFTC" \
     -target mips-none-none-elf \
     -enable-experimental-feature Embedded \
     -O -wmo \
     -parse-as-library \
-    -emit-object \
+    -emit-ir \
     -module-name SwiftLib \
-    -Xlinker --no-relax \
-    -Xlinker --static \
-    -Xlinker --no-dynamic-linker \
-    -Xcc -fno-stack-protector \
-    -Xcc -fno-PIC \
-    -Xcc -fno-PIC \
-    -Xcc -fno-pie \
-    -Xcc -mno-abicalls \
-    -Xcc -G0 \
-    -Xcc -mips3 \
+    -o "$BUILD_DIR/swiftlib.ll" \
+    src/lib.swift 2>&1
+
+if [ ! -f "$BUILD_DIR/swiftlib.ll" ]; then
+    echo "Failed to emit LLVM IR"
+    exit 1
+fi
+
+echo "Step 2: Compiling IR to object file with llc (non-abicalls)..."
+"$LLC" \
+    -mtriple=mips-none-none-elf \
+    -mcpu=mips32r2 \
+    -mattr=+mips3,+noabicalls,+gp64,+fpxx,+nooddspreg \
+    -relocation-model=static \
+    -filetype=obj \
     -o "$BUILD_DIR/swiftlib.o" \
-    src/lib.swift 2>&1 || echo "Swift compilation failed, check error above"
+    "$BUILD_DIR/swiftlib.ll" 2>&1
 
 # Check if object file was created
 if [ -f "$BUILD_DIR/swiftlib.o" ]; then
@@ -55,4 +56,5 @@ if [ -f "$BUILD_DIR/swiftlib.o" ]; then
     objdump -h "$BUILD_DIR/swiftlib.o" | head -10
 else
     echo "✗ Swift compilation failed"
+    exit 1
 fi
