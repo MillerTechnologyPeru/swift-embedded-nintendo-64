@@ -6,13 +6,23 @@ target triple = "mips-none-none-elf"
 %TSi = type <{ i32 }>
 %TSb = type <{ i1 }>
 %swift.function = type { ptr, ptr }
+%union.Gfx = type { i64 }
+%struct.GfxTask = type { %union.Mtx, %union.Mtx, [10 x %union.Mtx], [2048 x %union.Gfx] }
+%union.Mtx = type { i64, [56 x i8] }
 %TSvSg = type <{ [4 x i8] }>
 %TSu = type <{ i32 }>
 
+@current_task = external local_unnamed_addr global i32, align 4
+@gfx_list_ptr = external local_unnamed_addr global ptr, align 4
 @"$es16_emptyBoxStorageSi_Sitvp" = linkonce_odr protected global <{ %TSi, %TSi }> <{ %TSi zeroinitializer, %TSi <{ i32 -1 }> }>, align 4
 @_swift_embedded_error_metadata_storage = weak_odr protected global <{ i32, i32, i32 }> zeroinitializer, align 4
 @"$es25_errorMetadataInitialized33_21ED9D60359C2E63A6128CFAED697BD0LLSbvp" = linkonce_odr protected local_unnamed_addr global %TSb zeroinitializer, align 1
 @"$es23_errorBoxDestroyImplRef33_21ED9D60359C2E63A6128CFAED697BD0LLyyBpcvp" = linkonce_odr protected local_unnamed_addr global %swift.function { ptr @"$es23_errorBoxDestroyImplRef33_21ED9D60359C2E63A6128CFAED697BD0LLyyBpcvpfiyBpcfU_", ptr null }, align 4
+@gfx_setup_rspstate = external global [0 x %union.Gfx], align 8
+@gfx_setup_rdpstate = external global [0 x %union.Gfx], align 8
+@nuGfxZBuffer = external local_unnamed_addr global ptr, align 4
+@nuGfxCfb_ptr = external local_unnamed_addr global ptr, align 4
+@gfx_tasks = external global [2 x %struct.GfxTask], align 8
 @_swift1_autolink_entries = private constant [0 x i8] zeroinitializer, section ".swift1_autolink_entries", no_sanitize_address, align 4
 @llvm.used = appending global [3 x ptr] [ptr @_swift1_autolink_entries, ptr @_swift_exceptionPersonality, ptr @_swift_fatalError], section "llvm.metadata"
 
@@ -22,29 +32,150 @@ entry:
   ret i32 1
 }
 
-; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
-define protected noundef i32 @"$e8SwiftLib10call_swifts5Int32VyF"() local_unnamed_addr #0 {
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(readwrite, argmem: write, inaccessiblemem: none)
+define hidden void @gfx_rcp_init() local_unnamed_addr #1 {
 entry:
-  ret i32 1
+  %0 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i = getelementptr inbounds nuw i8, ptr %0, i32 8
+  store ptr %incdec.ptr.i, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -620363776, ptr %0, align 8, !tbaa !10
+  %w1.i = getelementptr inbounds nuw i8, ptr %0, i32 4
+  store i32 0, ptr %w1.i, align 4, !tbaa !10
+  %1 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i1 = getelementptr inbounds nuw i8, ptr %1, i32 8
+  store ptr %incdec.ptr.i1, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -570425344, ptr %1, align 8, !tbaa !10
+  %w1.i2 = getelementptr inbounds nuw i8, ptr %1, i32 4
+  store i32 ptrtoint (ptr getelementptr inbounds (i8, ptr @gfx_setup_rspstate, i32 -2147483648) to i32), ptr %w1.i2, align 4, !tbaa !10
+  %2 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i3 = getelementptr inbounds nuw i8, ptr %2, i32 8
+  store ptr %incdec.ptr.i3, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -570425344, ptr %2, align 8, !tbaa !10
+  %w1.i4 = getelementptr inbounds nuw i8, ptr %2, i32 4
+  store i32 ptrtoint (ptr getelementptr inbounds (i8, ptr @gfx_setup_rdpstate, i32 -2147483648) to i32), ptr %w1.i4, align 4, !tbaa !10
+  ret void
 }
 
+; Function Attrs: cold noreturn nounwind memory(inaccessiblemem: write)
+declare void @llvm.trap() #2
+
+; Function Attrs: nounwind
+define hidden void @gfx_clear_cfb() local_unnamed_addr #3 {
+entry:
+  %0 = load ptr, ptr @nuGfxZBuffer, align 4, !tbaa !11
+  %add.ptr.i = getelementptr inbounds i8, ptr %0, i32 -2147483648
+  %1 = ptrtoint ptr %add.ptr.i to i32
+  %2 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i = getelementptr inbounds nuw i8, ptr %2, i32 8
+  store ptr %incdec.ptr.i, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -33554432, ptr %2, align 8, !tbaa !10
+  %w1.i = getelementptr inbounds nuw i8, ptr %2, i32 4
+  store i32 %1, ptr %w1.i, align 4, !tbaa !10
+  %3 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i1 = getelementptr inbounds nuw i8, ptr %3, i32 8
+  store ptr %incdec.ptr.i1, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -486536703, ptr %3, align 8, !tbaa !10
+  %w1.i2 = getelementptr inbounds nuw i8, ptr %3, i32 4
+  store i32 3145728, ptr %w1.i2, align 4, !tbaa !10
+  %4 = load ptr, ptr @nuGfxZBuffer, align 4, !tbaa !11
+  %add.ptr.i3 = getelementptr inbounds i8, ptr %4, i32 -2147483648
+  %5 = ptrtoint ptr %add.ptr.i3 to i32
+  %6 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i4 = getelementptr inbounds nuw i8, ptr %6, i32 8
+  store ptr %incdec.ptr.i4, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -15728321, ptr %6, align 8, !tbaa !10
+  %w1.i5 = getelementptr inbounds nuw i8, ptr %6, i32 4
+  store i32 %5, ptr %w1.i5, align 4, !tbaa !10
+  %7 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i6 = getelementptr inbounds nuw i8, ptr %7, i32 8
+  store ptr %incdec.ptr.i6, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -150994944, ptr %7, align 8, !tbaa !10
+  %w1.i7 = getelementptr inbounds nuw i8, ptr %7, i32 4
+  store i32 -196612, ptr %w1.i7, align 4, !tbaa !10
+  %8 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i8 = getelementptr inbounds nuw i8, ptr %8, i32 8
+  store ptr %incdec.ptr.i8, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -162544708, ptr %8, align 8, !tbaa !10
+  %w1.i9 = getelementptr inbounds nuw i8, ptr %8, i32 4
+  store i32 0, ptr %w1.i9, align 4, !tbaa !10
+  %9 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i10 = getelementptr inbounds nuw i8, ptr %9, i32 8
+  store ptr %incdec.ptr.i10, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -419430400, ptr %9, align 8, !tbaa !10
+  %w1.i11 = getelementptr inbounds nuw i8, ptr %9, i32 4
+  store i32 0, ptr %w1.i11, align 4, !tbaa !10
+  %10 = load ptr, ptr @nuGfxCfb_ptr, align 4, !tbaa !11
+  %call.i = tail call i32 @osVirtualToPhysical(ptr noundef %10) #15
+  %11 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i12 = getelementptr inbounds nuw i8, ptr %11, i32 8
+  store ptr %incdec.ptr.i12, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -15728321, ptr %11, align 8, !tbaa !10
+  %w1.i13 = getelementptr inbounds nuw i8, ptr %11, i32 4
+  store i32 %call.i, ptr %w1.i13, align 4, !tbaa !10
+  %12 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i14 = getelementptr inbounds nuw i8, ptr %12, i32 8
+  store ptr %incdec.ptr.i14, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -150994944, ptr %12, align 8, !tbaa !10
+  %w1.i15 = getelementptr inbounds nuw i8, ptr %12, i32 4
+  store i32 65537, ptr %w1.i15, align 4, !tbaa !10
+  %13 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i16 = getelementptr inbounds nuw i8, ptr %13, i32 8
+  store ptr %incdec.ptr.i16, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -162544708, ptr %13, align 8, !tbaa !10
+  %w1.i17 = getelementptr inbounds nuw i8, ptr %13, i32 4
+  store i32 0, ptr %w1.i17, align 4, !tbaa !10
+  %14 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i18 = getelementptr inbounds nuw i8, ptr %14, i32 8
+  store ptr %incdec.ptr.i18, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -419430400, ptr %14, align 8, !tbaa !10
+  %w1.i19 = getelementptr inbounds nuw i8, ptr %14, i32 4
+  store i32 0, ptr %w1.i19, align 4, !tbaa !10
+  ret void
+}
+
+; Function Attrs: nounwind memory(readwrite, argmem: none, inaccessiblemem: write)
+define hidden nonnull ptr @gfx_new_task() local_unnamed_addr #4 {
+entry:
+  %0 = load i32, ptr @current_task, align 4
+  %1 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %0, i32 1)
+  %2 = extractvalue { i32, i1 } %1, 1
+  br i1 %2, label %7, label %3, !prof !13
+
+3:                                                ; preds = %entry
+  %4 = extractvalue { i32, i1 } %1, 0
+  %5 = srem i32 %4, 2
+  store i32 %5, ptr @current_task, align 4
+  %arrayidx.i = getelementptr inbounds [2 x %struct.GfxTask], ptr @gfx_tasks, i32 0, i32 %5
+  %display_list.i = getelementptr inbounds nuw i8, ptr %arrayidx.i, i32 768
+  %6 = ptrtoint ptr %display_list.i to i32
+  store i32 %6, ptr @gfx_list_ptr, align 4
+  ret ptr %arrayidx.i
+
+7:                                                ; preds = %entry
+  tail call void @llvm.trap() #16
+  unreachable
+}
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare { i32, i1 } @llvm.sadd.with.overflow.i32(i32, i32) #5
+
 ; Function Attrs: nounwind sspreq
-define weak_odr protected { ptr, ptr } @swift_allocBox(ptr %0) local_unnamed_addr #1 {
+define weak_odr protected { ptr, ptr } @swift_allocBox(ptr %0) local_unnamed_addr #6 {
 entry:
   %1 = alloca %TSvSg, align 4
   %arrayidx.i.i = getelementptr inbounds i8, ptr %0, i32 -4
-  %2 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !6
+  %2 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !14
   %flags1.i.i = getelementptr inbounds nuw i8, ptr %2, i32 40
-  %3 = load i32, ptr %flags1.i.i, align 4, !tbaa !11
+  %3 = load i32, ptr %flags1.i.i, align 4, !tbaa !16
   %and.i.i = and i32 %3, 255
   %size.i = getelementptr inbounds nuw i8, ptr %2, i32 32
-  %4 = load i32, ptr %size.i, align 4, !tbaa !14
+  %4 = load i32, ptr %size.i, align 4, !tbaa !19
   %5 = add nuw nsw i32 %and.i.i, 8
   %6 = xor i32 %and.i.i, -1
   %7 = and i32 %5, %6
   %8 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %7, i32 %4)
   %9 = extractvalue { i32, i1 } %8, 1
-  br i1 %9, label %23, label %10, !prof !15
+  br i1 %9, label %23, label %10, !prof !13
 
 10:                                               ; preds = %entry
   %11 = extractvalue { i32, i1 } %8, 0
@@ -62,7 +193,7 @@ entry:
 
 18:                                               ; preds = %10
   %19 = inttoptr i32 %16 to ptr
-  store ptr %0, ptr %19, align 4, !tbaa !16
+  store ptr %0, ptr %19, align 4, !tbaa !20
   %.refcount = getelementptr inbounds nuw i8, ptr %19, i32 4
   store i32 1, ptr %.refcount, align 4
   %20 = getelementptr inbounds nuw i8, ptr %19, i32 %7
@@ -71,39 +202,33 @@ entry:
   ret { ptr, ptr } %22
 
 23:                                               ; preds = %entry
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 
 24:                                               ; preds = %10
-  call void @llvm.trap() #12
+  call void @llvm.trap() #16
   unreachable
 }
 
-; Function Attrs: cold noreturn nounwind memory(inaccessiblemem: write)
-declare void @llvm.trap() #2
-
 ; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
-declare { i32, i1 } @llvm.sadd.with.overflow.i32(i32, i32) #3
-
-; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
-declare { i32, i1 } @llvm.ssub.with.overflow.i32(i32, i32) #3
+declare { i32, i1 } @llvm.ssub.with.overflow.i32(i32, i32) #5
 
 ; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite)
-declare void @llvm.lifetime.start.p0(i64 immarg, ptr captures(none)) #4
+declare void @llvm.lifetime.start.p0(i64 immarg, ptr captures(none)) #7
 
 ; Function Attrs: nofree nounwind
-declare i32 @posix_memalign(ptr, i32 signext, i32 signext) local_unnamed_addr #5
+declare i32 @posix_memalign(ptr, i32 signext, i32 signext) local_unnamed_addr #8
 
 ; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite)
-declare void @llvm.lifetime.end.p0(i64 immarg, ptr captures(none)) #4
+declare void @llvm.lifetime.end.p0(i64 immarg, ptr captures(none)) #7
 
 ; Function Attrs: nounwind
-define weak_odr protected { ptr, ptr } @swift_makeBoxUnique(ptr %0, ptr %1, i32 %2) local_unnamed_addr #6 {
+define weak_odr protected { ptr, ptr } @swift_makeBoxUnique(ptr %0, ptr %1, i32 %2) local_unnamed_addr #3 {
 entry:
   %3 = load ptr, ptr %0, align 4
   %4 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %2, i32 8)
   %5 = extractvalue { i32, i1 } %4, 1
-  br i1 %5, label %27, label %6, !prof !15
+  br i1 %5, label %27, label %6, !prof !13
 
 6:                                                ; preds = %entry
   %7 = extractvalue { i32, i1 } %4, 0
@@ -124,10 +249,10 @@ entry:
   %18 = extractvalue { ptr, ptr } %17, 0
   %19 = extractvalue { ptr, ptr } %17, 1
   %arrayidx.i.i = getelementptr inbounds i8, ptr %1, i32 -4
-  %20 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !6
+  %20 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !14
   %initializeWithCopyFn.i = getelementptr inbounds nuw i8, ptr %20, i32 8
-  %21 = load ptr, ptr %initializeWithCopyFn.i, align 4, !tbaa !18
-  %call1.i = tail call ptr %21(ptr noundef %19, ptr noundef %10, ptr noundef %1) #13
+  %21 = load ptr, ptr %initializeWithCopyFn.i, align 4, !tbaa !22
+  %call1.i = tail call ptr %21(ptr noundef %19, ptr noundef %10, ptr noundef %1) #15
   tail call void @swift_releaseBox(ptr %3)
   store ptr %18, ptr %0, align 4
   br label %22
@@ -140,15 +265,15 @@ entry:
   ret { ptr, ptr } %26
 
 27:                                               ; preds = %entry
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define linkonce_odr hidden void @swift_releaseBox(ptr %0) local_unnamed_addr #6 {
+define linkonce_odr hidden void @swift_releaseBox(ptr %0) local_unnamed_addr #3 {
 entry:
   %1 = icmp eq ptr %0, null
-  br i1 %1, label %22, label %2, !prof !15
+  br i1 %1, label %22, label %2, !prof !13
 
 2:                                                ; preds = %entry
   %3 = getelementptr inbounds nuw i8, ptr %0, i32 4
@@ -161,7 +286,7 @@ entry:
   %8 = atomicrmw sub ptr %3, i32 1 acq_rel, align 4
   %9 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %8, i32 -1)
   %10 = extractvalue { i32, i1 } %9, 1
-  br i1 %10, label %23, label %11, !prof !15
+  br i1 %10, label %23, label %11, !prof !13
 
 11:                                               ; preds = %7
   %12 = extractvalue { i32, i1 } %9, 0
@@ -172,45 +297,45 @@ entry:
 15:                                               ; preds = %11
   %16 = or i32 %4, 2147483647
   store atomic i32 %16, ptr %3 monotonic, align 4
-  %17 = load ptr, ptr %0, align 4, !tbaa !16
+  %17 = load ptr, ptr %0, align 4, !tbaa !20
   %arrayidx.i.i = getelementptr inbounds i8, ptr %17, i32 -4
-  %18 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !6
+  %18 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !14
   %flags1.i.i.i = getelementptr inbounds nuw i8, ptr %18, i32 40
-  %19 = load i32, ptr %flags1.i.i.i, align 4, !tbaa !11
+  %19 = load i32, ptr %flags1.i.i.i, align 4, !tbaa !16
   %and.i.i.i = and i32 %19, 255
   %add.i.i = add nuw nsw i32 %and.i.i.i, 8
   %not.i.i = xor i32 %and.i.i.i, -1
   %and.i.i = and i32 %add.i.i, %not.i.i
   %add.ptr.i.i = getelementptr inbounds nuw i8, ptr %0, i32 %and.i.i
   %destroyFn.i = getelementptr inbounds nuw i8, ptr %18, i32 4
-  %20 = load ptr, ptr %destroyFn.i, align 4, !tbaa !19
-  tail call void %20(ptr noundef nonnull %add.ptr.i.i, ptr noundef %17) #13
+  %20 = load ptr, ptr %destroyFn.i, align 4, !tbaa !23
+  tail call void %20(ptr noundef nonnull %add.ptr.i.i, ptr noundef %17) #15
   br label %21
 
 21:                                               ; preds = %11, %2, %15
   ret void
 
 22:                                               ; preds = %entry
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 
 23:                                               ; preds = %7
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_deallocBox(ptr %0) local_unnamed_addr #6 {
+define weak_odr protected void @swift_deallocBox(ptr %0) local_unnamed_addr #3 {
 entry:
   tail call void @free(ptr %0)
   ret void
 }
 
 ; Function Attrs: mustprogress nounwind willreturn allockind("free") memory(argmem: readwrite, inaccessiblemem: readwrite)
-declare void @free(ptr allocptr noundef captures(none)) local_unnamed_addr #7
+declare void @free(ptr allocptr noundef captures(none)) local_unnamed_addr #9
 
 ; Function Attrs: nounwind
-define weak_odr protected ptr @swift_allocEmptyBox() local_unnamed_addr #6 {
+define weak_odr protected ptr @swift_allocEmptyBox() local_unnamed_addr #3 {
 entry:
   %0 = load atomic i32, ptr getelementptr inbounds nuw (i8, ptr @"$es16_emptyBoxStorageSi_Sitvp", i32 4) monotonic, align 4
   %1 = and i32 %0, 2147483647
@@ -226,7 +351,7 @@ entry:
 }
 
 ; Function Attrs: nounwind sspreq
-define weak_odr protected ptr @swift_allocObject(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #1 {
+define weak_odr protected ptr @swift_allocObject(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #6 {
 entry:
   %3 = alloca %TSvSg, align 4
   %4 = icmp eq i32 %2, -1
@@ -235,7 +360,7 @@ entry:
 5:                                                ; preds = %entry
   %6 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %2, i32 1)
   %7 = extractvalue { i32, i1 } %6, 1
-  br i1 %7, label %17, label %8, !prof !15
+  br i1 %7, label %17, label %8, !prof !13
 
 8:                                                ; preds = %5
   %9 = extractvalue { i32, i1 } %6, 0
@@ -254,22 +379,22 @@ entry:
 
 15:                                               ; preds = %10
   %16 = inttoptr i32 %13 to ptr
-  store ptr %0, ptr %16, align 4, !tbaa !16
+  store ptr %0, ptr %16, align 4, !tbaa !20
   %.refcount = getelementptr inbounds nuw i8, ptr %16, i32 4
   store i32 1, ptr %.refcount, align 4
   ret ptr %16
 
 17:                                               ; preds = %5
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 
 18:                                               ; preds = %10
-  call void @llvm.trap() #12
+  call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind sspreq
-define weak_odr protected ptr @swift_allocObjectTyped(ptr %0, i32 signext %1, i32 signext %2, i64 zeroext %3) local_unnamed_addr #1 {
+define weak_odr protected ptr @swift_allocObjectTyped(ptr %0, i32 signext %1, i32 signext %2, i64 zeroext %3) local_unnamed_addr #6 {
 entry:
   %4 = alloca %TSvSg, align 4
   %5 = icmp eq i32 %2, -1
@@ -278,7 +403,7 @@ entry:
 6:                                                ; preds = %entry
   %7 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %2, i32 1)
   %8 = extractvalue { i32, i1 } %7, 1
-  br i1 %8, label %18, label %9, !prof !15
+  br i1 %8, label %18, label %9, !prof !13
 
 9:                                                ; preds = %6
   %10 = extractvalue { i32, i1 } %7, 0
@@ -297,47 +422,47 @@ entry:
 
 16:                                               ; preds = %11
   %17 = inttoptr i32 %14 to ptr
-  store ptr %0, ptr %17, align 4, !tbaa !16
+  store ptr %0, ptr %17, align 4, !tbaa !20
   %.refcount = getelementptr inbounds nuw i8, ptr %17, i32 4
   store i32 1, ptr %.refcount, align 4
   ret ptr %17
 
 18:                                               ; preds = %6
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 
 19:                                               ; preds = %11
-  call void @llvm.trap() #12
+  call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected ptr @swift_initStackObject(ptr %0, ptr %1) local_unnamed_addr #6 {
+define weak_odr protected ptr @swift_initStackObject(ptr %0, ptr %1) local_unnamed_addr #3 {
 entry:
-  store ptr %0, ptr %1, align 4, !tbaa !16
+  store ptr %0, ptr %1, align 4, !tbaa !20
   %.refcount = getelementptr inbounds nuw i8, ptr %1, i32 4
   store i32 -2147483647, ptr %.refcount, align 4
   ret ptr %1
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected ptr @swift_initStaticObject(ptr %0, ptr %1) local_unnamed_addr #6 {
+define weak_odr protected ptr @swift_initStaticObject(ptr %0, ptr %1) local_unnamed_addr #3 {
 entry:
-  store ptr %0, ptr %1, align 4, !tbaa !16
+  store ptr %0, ptr %1, align 4, !tbaa !20
   %.refcount = getelementptr inbounds nuw i8, ptr %1, i32 4
   store i32 -1, ptr %.refcount, align 4
   ret ptr %1
 }
 
 ; Function Attrs: nounwind
-define private void @0(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #6 {
+define private void @0(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #3 {
 entry:
   tail call void @free(ptr %0)
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_deallocClassInstance(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #6 {
+define weak_odr protected void @swift_deallocClassInstance(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #3 {
 entry:
   %.refcount = getelementptr inbounds nuw i8, ptr %0, i32 4
   %3 = load i32, ptr %.refcount, align 4
@@ -353,21 +478,21 @@ entry:
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_deallocPartialClassInstance(ptr %0, ptr %1, i32 signext %2, i32 signext %3) local_unnamed_addr #6 {
+define weak_odr protected void @swift_deallocPartialClassInstance(ptr %0, ptr %1, i32 signext %2, i32 signext %3) local_unnamed_addr #3 {
 entry:
-  %4 = load ptr, ptr %0, align 4, !tbaa !16
+  %4 = load ptr, ptr %0, align 4, !tbaa !20
   %.not2 = icmp eq ptr %4, %1
   br i1 %.not2, label %_swift_embedded_invoke_heap_object_optional_ivardestroyer.exit._crit_edge, label %.lr.ph
 
 .lr.ph:                                           ; preds = %entry, %_swift_embedded_invoke_heap_object_optional_ivardestroyer.exit
   %5 = phi ptr [ %9, %_swift_embedded_invoke_heap_object_optional_ivardestroyer.exit ], [ %4, %entry ]
   %arrayidx.i = getelementptr inbounds nuw i8, ptr %5, i32 8
-  %6 = load ptr, ptr %arrayidx.i, align 4, !tbaa !20
+  %6 = load ptr, ptr %arrayidx.i, align 4, !tbaa !6
   %tobool.not.i = icmp eq ptr %6, null
   br i1 %tobool.not.i, label %_swift_embedded_invoke_heap_object_optional_ivardestroyer.exit, label %if.then.i
 
 if.then.i:                                        ; preds = %.lr.ph
-  tail call void %6(ptr noundef nonnull %0) #13
+  tail call void %6(ptr noundef nonnull %0) #15
   br label %_swift_embedded_invoke_heap_object_optional_ivardestroyer.exit
 
 _swift_embedded_invoke_heap_object_optional_ivardestroyer.exit: ; preds = %.lr.ph, %if.then.i
@@ -383,7 +508,7 @@ _swift_embedded_invoke_heap_object_optional_ivardestroyer.exit._crit_edge: ; pre
 }
 
 ; Function Attrs: nounwind sspreq
-define weak_odr protected ptr @swift_slowAlloc(i32 signext %0, i32 signext %1) local_unnamed_addr #1 {
+define weak_odr protected ptr @swift_slowAlloc(i32 signext %0, i32 signext %1) local_unnamed_addr #6 {
 entry:
   %2 = alloca %TSvSg, align 4
   %3 = icmp eq i32 %1, -1
@@ -392,7 +517,7 @@ entry:
 4:                                                ; preds = %entry
   %5 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %1, i32 1)
   %6 = extractvalue { i32, i1 } %5, 1
-  br i1 %6, label %14, label %7, !prof !15
+  br i1 %6, label %14, label %7, !prof !13
 
 7:                                                ; preds = %4
   %8 = extractvalue { i32, i1 } %5, 0
@@ -410,31 +535,31 @@ entry:
   ret ptr %13
 
 14:                                               ; preds = %4
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_willThrow(ptr swiftself %0, ptr noalias captures(none) dereferenceable(4) %1) local_unnamed_addr #6 {
+define weak_odr protected void @swift_willThrow(ptr swiftself %0, ptr noalias captures(none) dereferenceable(4) %1) local_unnamed_addr #3 {
 entry:
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_unexpectedError(ptr %0, ptr %1, i32 %2, i1 %3, i32 %4) local_unnamed_addr #6 {
+define weak_odr protected void @swift_unexpectedError(ptr %0, ptr %1, i32 %2, i1 %3, i32 %4) local_unnamed_addr #3 {
 entry:
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_setDeallocating(ptr %0) local_unnamed_addr #6 {
+define weak_odr protected void @swift_setDeallocating(ptr %0) local_unnamed_addr #3 {
 entry:
   ret void
 }
 
 ; Function Attrs: nounwind
-define private ptr @1(ptr %0, i32 zeroext %1) local_unnamed_addr #6 {
+define private ptr @1(ptr %0, i32 zeroext %1) local_unnamed_addr #3 {
 entry:
   %2 = icmp eq ptr %0, null
   br i1 %2, label %12, label %3
@@ -448,7 +573,7 @@ entry:
 
 8:                                                ; preds = %3
   %9 = icmp slt i32 %1, 0
-  br i1 %9, label %13, label %10, !prof !15
+  br i1 %9, label %13, label %10, !prof !13
 
 10:                                               ; preds = %8
   %11 = atomicrmw add ptr %4, i32 %1 monotonic, align 4
@@ -458,18 +583,18 @@ entry:
   ret ptr %0
 
 13:                                               ; preds = %8
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define private void @2(ptr %0, i32 zeroext %1) local_unnamed_addr #6 {
-  tail call void @swift_nonatomic_release_nTm(ptr %0, i32 zeroext %1) #6
+define private void @2(ptr %0, i32 zeroext %1) local_unnamed_addr #3 {
+  tail call void @swift_nonatomic_release_nTm(ptr %0, i32 zeroext %1) #3
   ret void
 }
 
 ; Function Attrs: nounwind
-define internal void @swift_nonatomic_release_nTm(ptr %0, i32 zeroext %1) local_unnamed_addr #6 {
+define internal void @swift_nonatomic_release_nTm(ptr %0, i32 zeroext %1) local_unnamed_addr #3 {
 entry:
   %2 = icmp eq ptr %0, null
   br i1 %2, label %8, label %3
@@ -486,13 +611,13 @@ entry:
 
 9:                                                ; preds = %3
   %10 = icmp slt i32 %1, 0
-  br i1 %10, label %23, label %11, !prof !15
+  br i1 %10, label %23, label %11, !prof !13
 
 11:                                               ; preds = %9
   %12 = atomicrmw sub ptr %4, i32 %1 acq_rel, align 4
   %13 = tail call { i32, i1 } @llvm.ssub.with.overflow.i32(i32 %12, i32 %1)
   %14 = extractvalue { i32, i1 } %13, 1
-  br i1 %14, label %24, label %15, !prof !15
+  br i1 %14, label %24, label %15, !prof !13
 
 15:                                               ; preds = %11
   %16 = extractvalue { i32, i1 } %13, 0
@@ -503,23 +628,23 @@ entry:
 19:                                               ; preds = %15
   %20 = or i32 %5, 2147483647
   store atomic i32 %20, ptr %4 monotonic, align 4
-  %21 = load ptr, ptr %0, align 4, !tbaa !16
+  %21 = load ptr, ptr %0, align 4, !tbaa !20
   %arrayidx.i = getelementptr inbounds nuw i8, ptr %21, i32 4
-  %22 = load ptr, ptr %arrayidx.i, align 4, !tbaa !20
-  tail call void %22(ptr noundef nonnull %0) #13
+  %22 = load ptr, ptr %arrayidx.i, align 4, !tbaa !6
+  tail call void %22(ptr noundef nonnull %0) #15
   br label %8
 
 23:                                               ; preds = %9
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 
 24:                                               ; preds = %11
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define private ptr @3(ptr %0) local_unnamed_addr #6 {
+define private ptr @3(ptr %0) local_unnamed_addr #3 {
 entry:
   %1 = icmp eq ptr %0, null
   br i1 %1, label %9, label %2
@@ -540,13 +665,13 @@ entry:
 }
 
 ; Function Attrs: nounwind
-define private void @4(ptr %0) local_unnamed_addr #6 {
-  tail call void @swift_releaseTm(ptr %0) #6
+define private void @4(ptr %0) local_unnamed_addr #3 {
+  tail call void @swift_releaseTm(ptr %0) #3
   ret void
 }
 
 ; Function Attrs: nounwind
-define internal void @swift_releaseTm(ptr %0) local_unnamed_addr #6 {
+define internal void @swift_releaseTm(ptr %0) local_unnamed_addr #3 {
 entry:
   %1 = icmp eq ptr %0, null
   br i1 %1, label %19, label %2
@@ -562,7 +687,7 @@ entry:
   %8 = atomicrmw sub ptr %3, i32 1 acq_rel, align 4
   %9 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %8, i32 -1)
   %10 = extractvalue { i32, i1 } %9, 1
-  br i1 %10, label %20, label %11, !prof !15
+  br i1 %10, label %20, label %11, !prof !13
 
 11:                                               ; preds = %7
   %12 = extractvalue { i32, i1 } %9, 0
@@ -573,22 +698,22 @@ entry:
 15:                                               ; preds = %11
   %16 = or i32 %4, 2147483647
   store atomic i32 %16, ptr %3 monotonic, align 4
-  %17 = load ptr, ptr %0, align 4, !tbaa !16
+  %17 = load ptr, ptr %0, align 4, !tbaa !20
   %arrayidx.i = getelementptr inbounds nuw i8, ptr %17, i32 4
-  %18 = load ptr, ptr %arrayidx.i, align 4, !tbaa !20
-  tail call void %18(ptr noundef nonnull %0) #13
+  %18 = load ptr, ptr %arrayidx.i, align 4, !tbaa !6
+  tail call void %18(ptr noundef nonnull %0) #15
   br label %19
 
 19:                                               ; preds = %11, %entry, %2, %15
   ret void
 
 20:                                               ; preds = %7
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected zeroext i1 @swift_isUniquelyReferenced_native(ptr %0) local_unnamed_addr #6 {
+define weak_odr protected zeroext i1 @swift_isUniquelyReferenced_native(ptr %0) local_unnamed_addr #3 {
 entry:
   %1 = icmp eq ptr %0, null
   br i1 %1, label %6, label %2
@@ -605,7 +730,7 @@ entry:
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected zeroext i1 @swift_isUniquelyReferenced_nonNull_native(ptr %0) local_unnamed_addr #6 {
+define weak_odr protected zeroext i1 @swift_isUniquelyReferenced_nonNull_native(ptr %0) local_unnamed_addr #3 {
 entry:
   %1 = getelementptr inbounds nuw i8, ptr %0, i32 4
   %2 = load atomic i32, ptr %1 acquire, align 4
@@ -614,7 +739,7 @@ entry:
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected zeroext i1 @swift_isEscapingClosureAtFileLocation(ptr %0, ptr %1, i32 signext %2, i32 signext %3, i32 signext %4, i32 zeroext %5) local_unnamed_addr #6 {
+define weak_odr protected zeroext i1 @swift_isEscapingClosureAtFileLocation(ptr %0, ptr %1, i32 signext %2, i32 signext %3, i32 signext %4, i32 zeroext %5) local_unnamed_addr #3 {
 entry:
   %6 = icmp eq ptr %0, null
   br i1 %6, label %10, label %7
@@ -623,27 +748,27 @@ entry:
   %8 = getelementptr inbounds nuw i8, ptr %0, i32 4
   %9 = load atomic i32, ptr %8 acquire, align 4
   %.not = icmp eq i32 %9, 1
-  br i1 %.not, label %10, label %11, !prof !21
+  br i1 %.not, label %10, label %11, !prof !24
 
 10:                                               ; preds = %entry, %7
   ret i1 false
 
 11:                                               ; preds = %7
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected ptr @swift_getObjectType(ptr %0) local_unnamed_addr #6 {
+define weak_odr protected ptr @swift_getObjectType(ptr %0) local_unnamed_addr #3 {
 entry:
-  %1 = load ptr, ptr %0, align 4, !tbaa !16
+  %1 = load ptr, ptr %0, align 4, !tbaa !20
   ret ptr %1
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected ptr @swift_dynamicCastClass(ptr %0, ptr %1) local_unnamed_addr #6 {
+define weak_odr protected ptr @swift_dynamicCastClass(ptr %0, ptr %1) local_unnamed_addr #3 {
 entry:
-  %2 = load ptr, ptr %0, align 4, !tbaa !16
+  %2 = load ptr, ptr %0, align 4, !tbaa !20
   %.not2 = icmp eq ptr %2, %1
   br i1 %.not2, label %._crit_edge, label %.lr.ph
 
@@ -664,9 +789,9 @@ entry:
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected ptr @swift_dynamicCastClassUnconditional(ptr %0, ptr %1, ptr %2, i32 zeroext %3, i32 zeroext %4) local_unnamed_addr #6 {
+define weak_odr protected ptr @swift_dynamicCastClassUnconditional(ptr %0, ptr %1, ptr %2, i32 zeroext %3, i32 zeroext %4) local_unnamed_addr #3 {
 entry:
-  %5 = load ptr, ptr %0, align 4, !tbaa !16
+  %5 = load ptr, ptr %0, align 4, !tbaa !20
   %.not2 = icmp eq ptr %5, %1
   br i1 %.not2, label %._crit_edge, label %.lr.ph
 
@@ -685,12 +810,12 @@ entry:
   br i1 %.not, label %._crit_edge, label %.lr.ph
 
 11:                                               ; preds = %.lr.ph
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected zeroext i1 @swift_dynamicCast(ptr %0, ptr %1, ptr %2, ptr %3, i32 zeroext %4) local_unnamed_addr #6 {
+define weak_odr protected zeroext i1 @swift_dynamicCast(ptr %0, ptr %1, ptr %2, ptr %3, i32 zeroext %4) local_unnamed_addr #3 {
 entry:
   %5 = and i32 %4, 2
   %6 = icmp ne i32 %5, 0
@@ -710,7 +835,7 @@ entry:
 10:                                               ; preds = %entry
   %11 = and i32 %4, 1
   %.not = icmp eq i32 %11, 0
-  br i1 %.not, label %12, label %18, !prof !21
+  br i1 %.not, label %12, label %18, !prof !24
 
 12:                                               ; preds = %10
   %13 = and i32 %4, 4
@@ -720,10 +845,10 @@ entry:
 .sink.split:                                      ; preds = %12, %9
   %.ph = phi i1 [ true, %9 ], [ false, %12 ]
   %arrayidx.i.i2 = getelementptr inbounds i8, ptr %2, i32 -4
-  %14 = load ptr, ptr %arrayidx.i.i2, align 4, !tbaa !6
+  %14 = load ptr, ptr %arrayidx.i.i2, align 4, !tbaa !14
   %destroyFn.i3 = getelementptr inbounds nuw i8, ptr %14, i32 4
-  %15 = load ptr, ptr %destroyFn.i3, align 4, !tbaa !19
-  tail call void %15(ptr noundef %1, ptr noundef %2) #13
+  %15 = load ptr, ptr %destroyFn.i3, align 4, !tbaa !23
+  tail call void %15(ptr noundef %1, ptr noundef %2) #15
   br label %16
 
 16:                                               ; preds = %.sink.split, %12, %9, %entry
@@ -731,12 +856,12 @@ entry:
   ret i1 %17
 
 18:                                               ; preds = %10
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define linkonce_odr hidden i8 @"$es7tryCast33_8BFEAB69C69C8B87ED137407D82370D4LL3dst0J8Metadata3src0lK013takeOnSuccesss07DynamicB6ResultABLLOSv_S3VSbtF"(ptr %0, ptr %1, ptr %2, ptr %3, i1 %4) local_unnamed_addr #6 {
+define linkonce_odr hidden i8 @"$es7tryCast33_8BFEAB69C69C8B87ED137407D82370D4LL3dst0J8Metadata3src0lK013takeOnSuccesss07DynamicB6ResultABLLOSv_S3VSbtF"(ptr %0, ptr %1, ptr %2, ptr %3, i1 %4) local_unnamed_addr #3 {
 entry:
   %5 = icmp eq ptr %3, %1
   br i1 %5, label %tailrecurse._crit_edge, label %.lr.ph
@@ -760,7 +885,7 @@ entry:
 
 9:                                                ; preds = %7
   %10 = load ptr, ptr %.tr1020, align 4
-  %11 = load ptr, ptr %10, align 4, !tbaa !16
+  %11 = load ptr, ptr %10, align 4, !tbaa !20
   %.not25 = icmp eq ptr %11, %1
   br i1 %.not25, label %._crit_edge, label %.lr.ph26
 
@@ -804,19 +929,19 @@ tailrecurse._crit_edge:                           ; preds = %tailrecurse, %entry
   %.tr11.lcssa = phi ptr [ %3, %entry ], [ %25, %tailrecurse ]
   %.tr12.lcssa = phi i1 [ %4, %entry ], [ %28, %tailrecurse ]
   %arrayidx.i.i7 = getelementptr inbounds i8, ptr %.tr11.lcssa, i32 -4
-  %30 = load ptr, ptr %arrayidx.i.i7, align 4, !tbaa !6
+  %30 = load ptr, ptr %arrayidx.i.i7, align 4, !tbaa !14
   br i1 %.tr12.lcssa, label %33, label %31
 
 31:                                               ; preds = %tailrecurse._crit_edge
   %initializeWithCopyFn.i = getelementptr inbounds nuw i8, ptr %30, i32 8
-  %32 = load ptr, ptr %initializeWithCopyFn.i, align 4, !tbaa !18
-  %call1.i = tail call ptr %32(ptr noundef %0, ptr noundef %.tr10.lcssa, ptr noundef %.tr11.lcssa) #13
+  %32 = load ptr, ptr %initializeWithCopyFn.i, align 4, !tbaa !22
+  %call1.i = tail call ptr %32(ptr noundef %0, ptr noundef %.tr10.lcssa, ptr noundef %.tr11.lcssa) #15
   br label %"$es12MetadataKindO21__derived_enum_equalsySbAB_ABtFZTf4nnd_n.exit"
 
 33:                                               ; preds = %tailrecurse._crit_edge
   %initializeWithTakeFn.i = getelementptr inbounds nuw i8, ptr %30, i32 16
-  %34 = load ptr, ptr %initializeWithTakeFn.i, align 4, !tbaa !22
-  %call1.i8 = tail call ptr %34(ptr noundef %0, ptr noundef %.tr10.lcssa, ptr noundef %.tr11.lcssa) #13
+  %34 = load ptr, ptr %initializeWithTakeFn.i, align 4, !tbaa !25
+  %call1.i8 = tail call ptr %34(ptr noundef %0, ptr noundef %.tr10.lcssa, ptr noundef %.tr11.lcssa) #15
   br label %"$es12MetadataKindO21__derived_enum_equalsySbAB_ABtFZTf4nnd_n.exit"
 
 "$es12MetadataKindO21__derived_enum_equalsySbAB_ABtFZTf4nnd_n.exit": ; preds = %.lr.ph, %.lr.ph, %.lr.ph, %.lr.ph26, %7, %._crit_edge, %17, %12, %33, %31
@@ -825,7 +950,7 @@ tailrecurse._crit_edge:                           ; preds = %tailrecurse, %entry
 }
 
 ; Function Attrs: nounwind
-define linkonce_odr hidden { ptr, ptr } @"$es29ExistentialTypeRepresentationO7projectySV8metadata_SV5valuetSVF"(ptr %0, i8 %1) local_unnamed_addr #6 {
+define linkonce_odr hidden { ptr, ptr } @"$es29ExistentialTypeRepresentationO7projectySV8metadata_SV5valuetSVF"(ptr %0, i8 %1) local_unnamed_addr #3 {
 entry:
   switch i8 %1, label %2 [
     i8 0, label %16
@@ -841,9 +966,9 @@ entry:
   %5 = getelementptr inbounds nuw i8, ptr %4, i32 8
   %6 = load ptr, ptr %5, align 4
   %arrayidx.i.i = getelementptr inbounds i8, ptr %6, i32 -4
-  %7 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !6
+  %7 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !14
   %flags1.i.i = getelementptr inbounds nuw i8, ptr %7, i32 40
-  %8 = load i32, ptr %flags1.i.i, align 4, !tbaa !11
+  %8 = load i32, ptr %flags1.i.i, align 4, !tbaa !16
   %and.i.i = and i32 %8, 255
   %9 = add nuw nsw i32 %and.i.i, 16
   %10 = xor i32 %and.i.i, -1
@@ -860,9 +985,9 @@ entry:
   %17 = getelementptr inbounds nuw i8, ptr %0, i32 12
   %18 = load ptr, ptr %17, align 4
   %arrayidx.i.i7 = getelementptr inbounds i8, ptr %18, i32 -4
-  %19 = load ptr, ptr %arrayidx.i.i7, align 4, !tbaa !6
+  %19 = load ptr, ptr %arrayidx.i.i7, align 4, !tbaa !14
   %flags.i = getelementptr inbounds nuw i8, ptr %19, i32 40
-  %20 = load i32, ptr %flags.i, align 4, !tbaa !11
+  %20 = load i32, ptr %flags.i, align 4, !tbaa !16
   %21 = and i32 %20, 131072
   %.not = icmp eq i32 %21, 0
   br i1 %.not, label %28, label %22
@@ -885,7 +1010,7 @@ entry:
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_once(ptr %0, ptr %1, ptr %2) local_unnamed_addr #6 {
+define weak_odr protected void @swift_once(ptr %0, ptr %1, ptr %2) local_unnamed_addr #3 {
 entry:
   %3 = load atomic i32, ptr %0 acquire, align 4
   %4 = icmp slt i32 %3, 0
@@ -902,7 +1027,7 @@ entry:
   br i1 %9, label %.preheader, label %.loopexit
 
 10:                                               ; preds = %5
-  tail call void %1(ptr %2) #14
+  tail call void %1(ptr %2) #17
   store atomic i32 -1, ptr %0 release, align 4
   br label %.loopexit
 
@@ -911,7 +1036,7 @@ entry:
 }
 
 ; Function Attrs: nounwind sspreq
-define weak_odr protected ptr @swift_coroFrameAlloc(i32 signext %0, i64 zeroext %1) local_unnamed_addr #1 {
+define weak_odr protected ptr @swift_coroFrameAlloc(i32 signext %0, i64 zeroext %1) local_unnamed_addr #6 {
 entry:
   %2 = alloca %TSvSg, align 4
   call void @llvm.lifetime.start.p0(i64 4, ptr nonnull %2)
@@ -924,30 +1049,30 @@ entry:
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_deletedMethodError() local_unnamed_addr #6 {
+define weak_odr protected void @swift_deletedMethodError() local_unnamed_addr #3 {
 entry:
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind sspreq
-define weak_odr protected { ptr, ptr } @swift_allocError(ptr %0, ptr %1, ptr %2, i1 %3) local_unnamed_addr #1 {
+define weak_odr protected { ptr, ptr } @swift_allocError(ptr %0, ptr %1, ptr %2, i1 %3) local_unnamed_addr #6 {
 entry:
   %4 = alloca %TSvSg, align 4
   %arrayidx.i.i = getelementptr inbounds i8, ptr %0, i32 -4
-  %5 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !6
+  %5 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !14
   %flags1.i.i = getelementptr inbounds nuw i8, ptr %5, i32 40
-  %6 = load i32, ptr %flags1.i.i, align 4, !tbaa !11
+  %6 = load i32, ptr %flags1.i.i, align 4, !tbaa !16
   %and.i.i = and i32 %6, 255
   %size.i = getelementptr inbounds nuw i8, ptr %5, i32 32
-  %7 = load i32, ptr %size.i, align 4, !tbaa !14
+  %7 = load i32, ptr %size.i, align 4, !tbaa !19
   %8 = add nuw nsw i32 %and.i.i, 16
   %9 = xor i32 %and.i.i, -1
   %10 = and i32 %8, %9
   %11 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %10, i32 %7)
   %12 = extractvalue { i32, i1 } %11, 0
   %13 = extractvalue { i32, i1 } %11, 1
-  br i1 %13, label %36, label %14, !prof !15
+  br i1 %13, label %36, label %14, !prof !13
 
 14:                                               ; preds = %entry
   %15 = load i1, ptr @"$es25_errorMetadataInitialized33_21ED9D60359C2E63A6128CFAED697BD0LLSbvp", align 1
@@ -977,7 +1102,7 @@ entry:
 
 25:                                               ; preds = %18
   %26 = inttoptr i32 %23 to ptr
-  store ptr @_swift_embedded_error_metadata_storage, ptr %26, align 4, !tbaa !16
+  store ptr @_swift_embedded_error_metadata_storage, ptr %26, align 4, !tbaa !20
   %.refcount = getelementptr inbounds nuw i8, ptr %26, i32 4
   store i32 1, ptr %.refcount, align 4
   %27 = getelementptr inbounds nuw i8, ptr %26, i32 8
@@ -989,11 +1114,11 @@ entry:
   br i1 %30, label %33, label %.sink.split
 
 .sink.split:                                      ; preds = %25
-  %31 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !6
+  %31 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !14
   %.7 = select i1 %3, i32 16, i32 8
   %initializeWithTakeFn.i = getelementptr inbounds nuw i8, ptr %31, i32 %.7
-  %32 = load ptr, ptr %initializeWithTakeFn.i, align 4, !tbaa !20
-  %call1.i6 = call ptr %32(ptr noundef nonnull %29, ptr noundef nonnull %2, ptr noundef nonnull %0) #13
+  %32 = load ptr, ptr %initializeWithTakeFn.i, align 4, !tbaa !6
+  %call1.i6 = call ptr %32(ptr noundef nonnull %29, ptr noundef nonnull %2, ptr noundef nonnull %0) #15
   br label %33
 
 33:                                               ; preds = %.sink.split, %25
@@ -1002,59 +1127,59 @@ entry:
   ret { ptr, ptr } %35
 
 36:                                               ; preds = %entry
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 
 37:                                               ; preds = %18
-  call void @llvm.trap() #12
+  call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define linkonce_odr hidden void @"$es23_errorBoxDestroyImplRef33_21ED9D60359C2E63A6128CFAED697BD0LLyyBpcvpfiyBpcfU_"(ptr %0) #6 {
+define linkonce_odr hidden void @"$es23_errorBoxDestroyImplRef33_21ED9D60359C2E63A6128CFAED697BD0LLyyBpcvpfiyBpcfU_"(ptr %0) #3 {
 entry:
   ret void
 }
 
 ; Function Attrs: nounwind
-define linkonce_odr hidden void @_swift_embedded_error_destroy_impl(ptr %0) #6 {
+define linkonce_odr hidden void @_swift_embedded_error_destroy_impl(ptr %0) #3 {
 entry:
   %1 = getelementptr inbounds nuw i8, ptr %0, i32 8
   %2 = load ptr, ptr %1, align 4
   %arrayidx.i.i = getelementptr inbounds i8, ptr %2, i32 -4
-  %3 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !6
+  %3 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !14
   %flags1.i.i = getelementptr inbounds nuw i8, ptr %3, i32 40
-  %4 = load i32, ptr %flags1.i.i, align 4, !tbaa !11
+  %4 = load i32, ptr %flags1.i.i, align 4, !tbaa !16
   %and.i.i = and i32 %4, 255
   %5 = add nuw nsw i32 %and.i.i, 16
   %6 = xor i32 %and.i.i, -1
   %7 = and i32 %5, %6
   %8 = getelementptr inbounds nuw i8, ptr %0, i32 %7
   %destroyFn.i = getelementptr inbounds nuw i8, ptr %3, i32 4
-  %9 = load ptr, ptr %destroyFn.i, align 4, !tbaa !19
-  tail call void %9(ptr noundef %8, ptr noundef %2) #13
+  %9 = load ptr, ptr %destroyFn.i, align 4, !tbaa !23
+  tail call void %9(ptr noundef %8, ptr noundef %2) #15
   tail call void @free(ptr %0)
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_deallocError(ptr %0, ptr %1) local_unnamed_addr #6 {
+define weak_odr protected void @swift_deallocError(ptr %0, ptr %1) local_unnamed_addr #3 {
 entry:
   tail call void @free(ptr %0)
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_getErrorValue(ptr %0, ptr %1, ptr %2) local_unnamed_addr #6 {
+define weak_odr protected void @swift_getErrorValue(ptr %0, ptr %1, ptr %2) local_unnamed_addr #3 {
 entry:
   %3 = getelementptr inbounds nuw i8, ptr %0, i32 8
   %4 = load ptr, ptr %3, align 4
   %5 = getelementptr inbounds nuw i8, ptr %0, i32 12
   %6 = load ptr, ptr %5, align 4
   %arrayidx.i.i = getelementptr inbounds i8, ptr %4, i32 -4
-  %7 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !6
+  %7 = load ptr, ptr %arrayidx.i.i, align 4, !tbaa !14
   %flags1.i.i = getelementptr inbounds nuw i8, ptr %7, i32 40
-  %8 = load i32, ptr %flags1.i.i, align 4, !tbaa !11
+  %8 = load i32, ptr %flags1.i.i, align 4, !tbaa !16
   %and.i.i = and i32 %8, 255
   %9 = add nuw nsw i32 %and.i.i, 16
   %10 = xor i32 %and.i.i, -1
@@ -1069,7 +1194,7 @@ entry:
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected float @swift_intToFloat32(ptr %0, i32 %1) local_unnamed_addr #6 {
+define weak_odr protected float @swift_intToFloat32(ptr %0, i32 %1) local_unnamed_addr #3 {
 entry:
   %2 = ashr i32 %1, 8
   %.off = add nsw i32 %2, -1
@@ -1081,7 +1206,7 @@ entry:
   %6 = sdiv i32 %5, 32
   %7 = add nsw i32 %6, -1
   %8 = icmp slt i32 %2, 33
-  br i1 %8, label %36, label %9, !prof !15
+  br i1 %8, label %36, label %9, !prof !13
 
 9:                                                ; preds = %4
   %10 = load i32, ptr %0, align 4
@@ -1123,12 +1248,12 @@ entry:
   ret float %35
 
 36:                                               ; preds = %4
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected double @swift_intToFloat64(ptr %0, i32 %1) local_unnamed_addr #6 {
+define weak_odr protected double @swift_intToFloat64(ptr %0, i32 %1) local_unnamed_addr #3 {
 entry:
   %2 = ashr i32 %1, 8
   %.off = add nsw i32 %2, -1
@@ -1140,7 +1265,7 @@ entry:
   %6 = sdiv i32 %5, 32
   %7 = add nsw i32 %6, -1
   %8 = icmp slt i32 %2, 33
-  br i1 %8, label %36, label %9, !prof !15
+  br i1 %8, label %36, label %9, !prof !13
 
 9:                                                ; preds = %4
   %10 = load i32, ptr %0, align 4
@@ -1182,22 +1307,22 @@ entry:
   ret double %35
 
 36:                                               ; preds = %4
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected i32 @_swift_exceptionPersonality(i32 signext %0, i32 signext %1, i64 zeroext %2, ptr %3, ptr %4) #6 {
+define weak_odr protected i32 @_swift_exceptionPersonality(i32 signext %0, i32 signext %1, i64 zeroext %2, ptr %3, ptr %4) #3 {
 entry:
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: noinline nounwind
-define weak_odr protected void @swift_clearSensitive(ptr %0, i32 signext %1) local_unnamed_addr #8 {
+define weak_odr protected void @swift_clearSensitive(ptr %0, i32 signext %1) local_unnamed_addr #10 {
 entry:
   %2 = icmp slt i32 %1, 0
-  br i1 %2, label %5, label %3, !prof !15
+  br i1 %2, label %5, label %3, !prof !13
 
 3:                                                ; preds = %entry
   %4 = icmp eq i32 %1, 0
@@ -1211,12 +1336,12 @@ entry:
   ret void
 
 5:                                                ; preds = %entry
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected i32 @swift_retainCount(ptr %0) local_unnamed_addr #6 {
+define weak_odr protected i32 @swift_retainCount(ptr %0) local_unnamed_addr #3 {
 entry:
   %1 = icmp eq ptr %0, null
   br i1 %1, label %6, label %2
@@ -1233,14 +1358,14 @@ entry:
 }
 
 ; Function Attrs: nounwind
-define private void @5(ptr %0) #6 {
+define private void @5(ptr %0) #3 {
 entry:
-  tail call void @llvm.trap() #12
+  tail call void @llvm.trap() #16
   unreachable
 }
 
 ; Function Attrs: nounwind
-define linkonce_odr hidden i8 @"$es12MetadataKindO8metadataABSgSV_tcfCTf4nd_n"(ptr %0) local_unnamed_addr #6 {
+define linkonce_odr hidden i8 @"$es12MetadataKindO8metadataABSgSV_tcfCTf4nd_n"(ptr %0) local_unnamed_addr #3 {
 entry:
   %1 = load i32, ptr %0, align 4
   switch i32 %1, label %2 [
@@ -1275,162 +1400,168 @@ switch.lookup:                                    ; preds = %4, %entry, %2, %11,
   ret i8 %12
 }
 
+; Function Attrs: optsize
+declare i32 @osVirtualToPhysical(ptr noundef) local_unnamed_addr #11
+
 ; Function Attrs: inlinehint nounwind optsize
-define internal void @_swift_embedded_error_box_destroy(ptr noundef %object) #9 {
+define internal void @_swift_embedded_error_box_destroy(ptr noundef %object) #12 {
 entry:
   %0 = getelementptr inbounds nuw i8, ptr %object, i32 8
   %1 = load ptr, ptr %0, align 4
   %arrayidx.i.i.i = getelementptr inbounds i8, ptr %1, i32 -4
-  %2 = load ptr, ptr %arrayidx.i.i.i, align 4, !tbaa !6
+  %2 = load ptr, ptr %arrayidx.i.i.i, align 4, !tbaa !14
   %flags1.i.i.i = getelementptr inbounds nuw i8, ptr %2, i32 40
-  %3 = load i32, ptr %flags1.i.i.i, align 4, !tbaa !11
+  %3 = load i32, ptr %flags1.i.i.i, align 4, !tbaa !16
   %and.i.i.i = and i32 %3, 255
   %4 = add nuw nsw i32 %and.i.i.i, 16
   %5 = xor i32 %and.i.i.i, -1
   %6 = and i32 %4, %5
   %7 = getelementptr inbounds nuw i8, ptr %object, i32 %6
   %destroyFn.i.i = getelementptr inbounds nuw i8, ptr %2, i32 4
-  %8 = load ptr, ptr %destroyFn.i.i, align 4, !tbaa !19
-  tail call void %8(ptr noundef %7, ptr noundef %1) #13
+  %8 = load ptr, ptr %destroyFn.i.i, align 4, !tbaa !23
+  tail call void %8(ptr noundef %7, ptr noundef %1) #15
   tail call void @free(ptr %object)
   ret void
 }
 
 ; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
-declare i32 @llvm.smax.i32(i32, i32) #10
+declare i32 @llvm.smax.i32(i32, i32) #13
 
 ; Function Attrs: nocallback nofree nounwind willreturn memory(argmem: write)
-declare void @llvm.memset.p0.i32(ptr writeonly captures(none), i8, i32, i1 immarg) #11
+declare void @llvm.memset.p0.i32(ptr writeonly captures(none), i8, i32, i1 immarg) #14
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_release_n(ptr %0, i32 zeroext %1) local_unnamed_addr #6 {
-  tail call void @swift_nonatomic_release_nTm(ptr %0, i32 zeroext %1) #6
+define weak_odr protected void @swift_release_n(ptr %0, i32 zeroext %1) local_unnamed_addr #3 {
+  tail call void @swift_nonatomic_release_nTm(ptr %0, i32 zeroext %1) #3
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected ptr @swift_retain(ptr %0) local_unnamed_addr #6 {
-  %2 = tail call ptr @3(ptr %0) #6
+define weak_odr protected ptr @swift_retain(ptr %0) local_unnamed_addr #3 {
+  %2 = tail call ptr @3(ptr %0) #3
   ret ptr %2
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected ptr @swift_nonatomic_retain(ptr %0) local_unnamed_addr #6 {
-  %2 = tail call ptr @3(ptr %0) #6
+define weak_odr protected ptr @swift_nonatomic_retain(ptr %0) local_unnamed_addr #3 {
+  %2 = tail call ptr @3(ptr %0) #3
   ret ptr %2
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected ptr @swift_bridgeObjectRetain(ptr %0) local_unnamed_addr #6 {
-  %2 = tail call ptr @3(ptr %0) #6
+define weak_odr protected ptr @swift_bridgeObjectRetain(ptr %0) local_unnamed_addr #3 {
+  %2 = tail call ptr @3(ptr %0) #3
   ret ptr %2
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected ptr @swift_errorRetain(ptr %0) local_unnamed_addr #6 {
-  %2 = tail call ptr @3(ptr %0) #6
+define weak_odr protected ptr @swift_errorRetain(ptr %0) local_unnamed_addr #3 {
+  %2 = tail call ptr @3(ptr %0) #3
   ret ptr %2
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_bridgeObjectRelease(ptr %0) local_unnamed_addr #6 {
-  tail call void @swift_releaseTm(ptr %0) #6
+define weak_odr protected void @swift_bridgeObjectRelease(ptr %0) local_unnamed_addr #3 {
+  tail call void @swift_releaseTm(ptr %0) #3
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected ptr @swift_retain_n(ptr %0, i32 zeroext %1) local_unnamed_addr #6 {
-  %3 = tail call ptr @1(ptr %0, i32 zeroext %1) #6
+define weak_odr protected ptr @swift_retain_n(ptr %0, i32 zeroext %1) local_unnamed_addr #3 {
+  %3 = tail call ptr @1(ptr %0, i32 zeroext %1) #3
   ret ptr %3
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected ptr @swift_nonatomic_retain_n(ptr %0, i32 zeroext %1) local_unnamed_addr #6 {
-  %3 = tail call ptr @1(ptr %0, i32 zeroext %1) #6
+define weak_odr protected ptr @swift_nonatomic_retain_n(ptr %0, i32 zeroext %1) local_unnamed_addr #3 {
+  %3 = tail call ptr @1(ptr %0, i32 zeroext %1) #3
   ret ptr %3
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected ptr @swift_bridgeObjectRetain_n(ptr %0, i32 zeroext %1) local_unnamed_addr #6 {
-  %3 = tail call ptr @1(ptr %0, i32 zeroext %1) #6
+define weak_odr protected ptr @swift_bridgeObjectRetain_n(ptr %0, i32 zeroext %1) local_unnamed_addr #3 {
+  %3 = tail call ptr @1(ptr %0, i32 zeroext %1) #3
   ret ptr %3
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_nonatomic_release_n(ptr %0, i32 zeroext %1) local_unnamed_addr #6 {
-  tail call void @2(ptr %0, i32 zeroext %1) #6
+define weak_odr protected void @swift_nonatomic_release_n(ptr %0, i32 zeroext %1) local_unnamed_addr #3 {
+  tail call void @2(ptr %0, i32 zeroext %1) #3
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_bridgeObjectRelease_n(ptr %0, i32 zeroext %1) local_unnamed_addr #6 {
-  tail call void @2(ptr %0, i32 zeroext %1) #6
+define weak_odr protected void @swift_bridgeObjectRelease_n(ptr %0, i32 zeroext %1) local_unnamed_addr #3 {
+  tail call void @2(ptr %0, i32 zeroext %1) #3
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_errorInMain(ptr %0) local_unnamed_addr #6 {
-  tail call void @5(ptr %0) #6
+define weak_odr protected void @swift_errorInMain(ptr %0) local_unnamed_addr #3 {
+  tail call void @5(ptr %0) #3
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @_swift_fatalError(ptr %0) #6 {
-  tail call void @5(ptr %0) #6
+define weak_odr protected void @_swift_fatalError(ptr %0) #3 {
+  tail call void @5(ptr %0) #3
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_deallocUninitializedObject(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #6 {
-  tail call void @0(ptr %0, i32 signext %1, i32 signext %2) #6
+define weak_odr protected void @swift_deallocUninitializedObject(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #3 {
+  tail call void @0(ptr %0, i32 signext %1, i32 signext %2) #3
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_deallocObject(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #6 {
-  tail call void @0(ptr %0, i32 signext %1, i32 signext %2) #6
+define weak_odr protected void @swift_deallocObject(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #3 {
+  tail call void @0(ptr %0, i32 signext %1, i32 signext %2) #3
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_slowDealloc(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #6 {
-  tail call void @0(ptr %0, i32 signext %1, i32 signext %2) #6
+define weak_odr protected void @swift_slowDealloc(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #3 {
+  tail call void @0(ptr %0, i32 signext %1, i32 signext %2) #3
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_release(ptr %0) local_unnamed_addr #6 {
-  tail call void @4(ptr %0) #6
+define weak_odr protected void @swift_release(ptr %0) local_unnamed_addr #3 {
+  tail call void @4(ptr %0) #3
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_nonatomic_release(ptr %0) local_unnamed_addr #6 {
-  tail call void @4(ptr %0) #6
+define weak_odr protected void @swift_nonatomic_release(ptr %0) local_unnamed_addr #3 {
+  tail call void @4(ptr %0) #3
   ret void
 }
 
 ; Function Attrs: nounwind
-define weak_odr protected void @swift_errorRelease(ptr %0) local_unnamed_addr #6 {
-  tail call void @4(ptr %0) #6
+define weak_odr protected void @swift_errorRelease(ptr %0) local_unnamed_addr #3 {
+  tail call void @4(ptr %0) #3
   ret void
 }
 
 attributes #0 = { mustprogress nofree norecurse nosync nounwind willreturn memory(none) "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
-attributes #1 = { nounwind sspreq "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #1 = { mustprogress nofree norecurse nosync nounwind willreturn memory(readwrite, argmem: write, inaccessiblemem: none) "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
 attributes #2 = { cold noreturn nounwind memory(inaccessiblemem: write) }
-attributes #3 = { mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none) }
-attributes #4 = { mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite) }
-attributes #5 = { nofree nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
-attributes #6 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
-attributes #7 = { mustprogress nounwind willreturn allockind("free") memory(argmem: readwrite, inaccessiblemem: readwrite) "alloc-family"="malloc" "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
-attributes #8 = { noinline nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
-attributes #9 = { inlinehint nounwind optsize "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
-attributes #10 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
-attributes #11 = { nocallback nofree nounwind willreturn memory(argmem: write) }
-attributes #12 = { nomerge }
-attributes #13 = { nounwind optsize }
-attributes #14 = { nounwind }
+attributes #3 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #4 = { nounwind memory(readwrite, argmem: none, inaccessiblemem: write) "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #5 = { mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+attributes #6 = { nounwind sspreq "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #7 = { mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite) }
+attributes #8 = { nofree nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #9 = { mustprogress nounwind willreturn allockind("free") memory(argmem: readwrite, inaccessiblemem: readwrite) "alloc-family"="malloc" "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #10 = { noinline nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #11 = { optsize "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #12 = { inlinehint nounwind optsize "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #13 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+attributes #14 = { nocallback nofree nounwind willreturn memory(argmem: write) }
+attributes #15 = { nounwind optsize }
+attributes #16 = { nomerge }
+attributes #17 = { nounwind }
 
 !swift.module.flags = !{!0}
 !llvm.module.flags = !{!1, !2, !3, !4, !5}
@@ -1442,20 +1573,23 @@ attributes #14 = { nounwind }
 !3 = !{i32 7, !"frame-pointer", i32 2}
 !4 = !{i32 4, !"Objective-C Garbage Collection", i32 100992768}
 !5 = !{i32 1, !"Swift Version", i32 7}
-!6 = !{!7, !8, i64 0}
-!7 = !{!"", !8, i64 0}
-!8 = !{!"any pointer", !9, i64 0}
-!9 = !{!"omnipotent char", !10, i64 0}
-!10 = !{!"Simple C/C++ TBAA"}
-!11 = !{!12, !13, i64 40}
-!12 = !{!"", !8, i64 0, !8, i64 4, !8, i64 8, !8, i64 12, !8, i64 16, !8, i64 20, !8, i64 24, !8, i64 28, !13, i64 32, !13, i64 36, !13, i64 40}
-!13 = !{!"int", !9, i64 0}
-!14 = !{!12, !13, i64 32}
-!15 = !{!"branch_weights", !"expected", i32 1, i32 2000}
-!16 = !{!17, !8, i64 0}
-!17 = !{!"EmbeddedHeapObject", !8, i64 0}
-!18 = !{!12, !8, i64 8}
-!19 = !{!12, !8, i64 4}
-!20 = !{!8, !8, i64 0}
-!21 = !{!"branch_weights", !"expected", i32 2000, i32 1}
-!22 = !{!12, !8, i64 16}
+!6 = !{!7, !7, i64 0}
+!7 = !{!"any pointer", !8, i64 0}
+!8 = !{!"omnipotent char", !9, i64 0}
+!9 = !{!"Simple C/C++ TBAA"}
+!10 = !{!8, !8, i64 0}
+!11 = !{!12, !12, i64 0}
+!12 = !{!"p1 short", !7, i64 0}
+!13 = !{!"branch_weights", !"expected", i32 1, i32 2000}
+!14 = !{!15, !7, i64 0}
+!15 = !{!"", !7, i64 0}
+!16 = !{!17, !18, i64 40}
+!17 = !{!"", !7, i64 0, !7, i64 4, !7, i64 8, !7, i64 12, !7, i64 16, !7, i64 20, !7, i64 24, !7, i64 28, !18, i64 32, !18, i64 36, !18, i64 40}
+!18 = !{!"int", !8, i64 0}
+!19 = !{!17, !18, i64 32}
+!20 = !{!21, !7, i64 0}
+!21 = !{!"EmbeddedHeapObject", !7, i64 0}
+!22 = !{!17, !7, i64 8}
+!23 = !{!17, !7, i64 4}
+!24 = !{!"branch_weights", !"expected", i32 2000, i32 1}
+!25 = !{!17, !7, i64 16}

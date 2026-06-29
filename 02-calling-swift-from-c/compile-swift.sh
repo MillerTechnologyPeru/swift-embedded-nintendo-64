@@ -16,6 +16,20 @@ BUILD_DIR="${BUILD_DIR:-build}"
 # Create build directory
 mkdir -p "$BUILD_DIR"
 
+# The host Swift compiler imports the N64 SDK bridging header (src/gfx_bridge.h),
+# but the SDK headers only ship inside the Docker image. Extract them once into
+# n64-headers/ so the host clang importer can find <nusys.h>, <ultra64.h>, etc.
+N64_HEADERS_DIR="${N64_HEADERS_DIR:-n64-headers}"
+if [ ! -f "$N64_HEADERS_DIR/nusys/nusys.h" ]; then
+    echo "Extracting N64 SDK headers from Docker image into $N64_HEADERS_DIR..."
+    docker build --platform linux/amd64 -t n64-swift-sdk -f Dockerfile . >/dev/null
+    cid=$(docker create --platform linux/amd64 n64-swift-sdk)
+    rm -rf "$N64_HEADERS_DIR"
+    mkdir -p "$N64_HEADERS_DIR"
+    docker cp "$cid":/usr/include/n64/. "$N64_HEADERS_DIR"/
+    docker rm "$cid" >/dev/null
+fi
+
 echo "Compiling Swift code with host compiler..."
 echo "Swift compiler: $SWIFTC"
 echo "LLVM llc: $LLC"
@@ -29,10 +43,18 @@ echo "Step 1: Emitting LLVM IR..."
     -enable-experimental-feature Embedded \
     -O -wmo \
     -parse-as-library \
+    -import-objc-header src/gfx_bridge.h \
+    -Xcc -In64-headers \
+    -Xcc -In64-headers/PR \
+    -Xcc -In64-headers/nustd \
+    -Xcc -In64-headers/nusys \
+    -Xcc -D_LANGUAGE_C \
+    -Xcc -DF3DEX_GBI_2=1 \
+    -Xcc -DN64 \
     -emit-ir \
     -module-name SwiftLib \
     -o "$BUILD_DIR/swiftlib.ll" \
-    src/lib.swift 2>&1
+    src/lib.swift src/gfx.swift 2>&1
 
 if [ ! -f "$BUILD_DIR/swiftlib.ll" ]; then
     echo "Failed to emit LLVM IR"
