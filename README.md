@@ -16,11 +16,15 @@ that must call N64 SDK float functions.
 
 Uses `@c @implementation` (Swift 6.3) to implement functions declared in C headers.
 
+<img width="771" height="632" alt="Screenshot 2026-06-29 at 8 13 38 AM" src="https://github.com/user-attachments/assets/41544965-1622-4b85-8c34-dbf48723e6b0" />
+
 ### [libdragon/](libdragon/) — Swift + libdragon
 Animated color grid using the open-source [libdragon](https://github.com/DragonMinded/libdragon)
 SDK and its `n64.mk` build system — a completely different toolchain from the
 NuSYS example. Swift drives libdragon's `rdpq` fill API; C owns libdragon init,
 the frame loop, and any logic containing conditionals.
+
+<img width="767" height="628" alt="Screenshot 2026-06-29 at 8 12 53 AM" src="https://github.com/user-attachments/assets/b4d7aa60-f640-4029-8d5a-4bed68901197" />
 
 ## Cross-toolchain gotchas
 
