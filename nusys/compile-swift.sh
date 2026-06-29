@@ -65,7 +65,7 @@ echo "Step 2: Compiling IR to object file with llc (non-abicalls)..."
 "$LLC" \
     -mtriple=mips-none-none-elf \
     -mcpu=mips32r2 \
-    -mattr=+mips3,+noabicalls,+gp64,+fpxx,+nooddspreg \
+    -mattr=+mips3,+noabicalls,+gp64,+fpxx,+nooddspreg,-mips4_32,-mips4_32r2 \
     -relocation-model=static \
     -filetype=obj \
     -o "$BUILD_DIR/swiftlib.o" \

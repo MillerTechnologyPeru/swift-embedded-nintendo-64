@@ -1,19 +1,20 @@
 // Swift drawing logic, called once per frame from main.c.
-//
-// clamp() and cell-edge selection live in render_bridge.c (compiled by the
-// libdragon mips64-elf GCC) because LLVM emits movn/movz (MIPS IV conditional
-// moves) for Swift conditionals, and the VR4300 is MIPS III — those opcodes
-// raise a Reserved Instruction exception at runtime.
 
 private let CELLS_X: Int32 = 16
 private let CELLS_Y: Int32 = 12
 
+private func clamp(_ v: Int32) -> UInt8 {
+    if v < 0 { return 0 }
+    if v > 255 { return 255 }
+    return UInt8(v)
+}
+
 private func colorRamp(_ t: Int32) -> (UInt8, UInt8, UInt8) {
     let p = t & 0xFF
-    let r = bridge_abs(p - 128) * 2
-    let g = 255 - bridge_abs(p - 85) * 3
-    let b = 255 - bridge_abs(p - 170) * 3
-    return (bridge_clamp(r), bridge_clamp(g), bridge_clamp(b))
+    let r = Int32(abs(Int(p) - 128)) * 2
+    let g = 255 - Int32(abs(Int(p) - 85) * 3)
+    let b = 255 - Int32(abs(Int(p) - 170) * 3)
+    return (clamp(r), clamp(g), clamp(b))
 }
 
 private func packRGBA(_ r: UInt8, _ g: UInt8, _ b: UInt8) -> UInt32 {
@@ -41,8 +42,8 @@ func swift_render(_ frame: UInt32) {
             let (r, g, b) = colorRamp((cx + cy) * 16 + f * 4)
             let x0 = cx * cellW
             let y0 = cy * cellH
-            let x1 = bridge_cell_edge(x0, cellW, w)
-            let y1 = bridge_cell_edge(y0, cellH, h)
+            let x1 = (cx == CELLS_X - 1) ? (w - 1) : (x0 + cellW - 1)
+            let y1 = (cy == CELLS_Y - 1) ? (h - 1) : (y0 + cellH - 1)
             bridge_fill_rect(packRGBA(r, g, b), packXY(x0, y0), packXY(x1, y1))
             cx += 1
         }

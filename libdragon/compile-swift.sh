@@ -5,12 +5,7 @@
 # configuration that the N64 linker accepts.
 #
 # Swift only imports src/render_bridge.h (plain stdint declarations), so unlike
-# example 02 we do NOT need libdragon's headers on the host.
-#
-# NOTE: conditionals (if/ternary/min/max) must NOT appear in Swift code that
-# crosses LLVM codegen: LLVM emits movn/movz (MIPS IV) for select IR, and the
-# VR4300 is MIPS III — those opcodes raise Reserved Instruction at runtime.
-# Move any such logic to render_bridge.c, compiled by the libdragon GCC.
+# the nusys example we do NOT need libdragon's headers on the host.
 
 set -e
 
@@ -65,11 +60,17 @@ if [ ! -f "$BUILD_DIR/swiftlib.ll" ]; then
 fi
 
 # Step 2: Lower IR to a non-abicalls MIPS object.
-echo "Step 2: Compiling IR to object file with llc (non-abicalls)..."
+#
+# -mips4_32 and -mips4_32r2 disable the subset of MIPS IV instructions
+# (movn/movz) that MIPS32 inherited. Without these flags LLVM emits movn/movz
+# for integer `select` IR (if/ternary/min/max in Swift), which are MIPS IV
+# conditional-move instructions the VR4300 (MIPS III) does not support —
+# executing them raises a Reserved Instruction exception at runtime.
+echo "Step 2: Compiling IR to object file with llc (non-abicalls, no movn/movz)..."
 "$LLC" \
     -mtriple=mips-none-none-elf \
     -mcpu=mips32r2 \
-    -mattr=+mips3,+noabicalls,+gp64,+fpxx,+nooddspreg \
+    -mattr=+mips3,+noabicalls,+gp64,+fpxx,+nooddspreg,-mips4_32,-mips4_32r2 \
     -relocation-model=static \
     -filetype=obj \
     -o "$BUILD_DIR/swiftlib.o" \
@@ -78,25 +79,6 @@ echo "Step 2: Compiling IR to object file with llc (non-abicalls)..."
 if [ ! -f "$BUILD_DIR/swiftlib.o" ]; then
     echo "✗ Swift compilation failed"
     exit 1
-fi
-
-# Verify no movn/movz (MIPS IV conditional moves) slipped into reachable code.
-# The VR4300 is MIPS III and will raise Reserved Instruction on these.
-# Swift emits dead runtime support functions (swift_allocBox, swift_allocObject,
-# etc.) that also contain movn/movz — those are never called and the linker's
-# --gc-sections will drop them, so we only check the first (application) symbol.
-OBJDUMP_BIN="$(command -v llvm-objdump 2>/dev/null || true)"
-if [ -n "$OBJDUMP_BIN" ]; then
-    # Disassemble only swift_render (first symbol; ends before swift_allocBox)
-    COUNT=$("$OBJDUMP_BIN" -d --disassemble-symbols=swift_render "$BUILD_DIR/swiftlib.o" 2>/dev/null \
-            | grep -icE '\bmovn\b|\bmovz\b' || true)
-    if [ "$COUNT" -gt 0 ]; then
-        echo "✗ $COUNT movn/movz instruction(s) in swift_render — move the generating Swift code to C."
-        "$OBJDUMP_BIN" -d --disassemble-symbols=swift_render "$BUILD_DIR/swiftlib.o" 2>/dev/null \
-            | grep -iE '\bmovn\b|\bmovz\b'
-        exit 1
-    fi
-    echo "  ✓ No movn/movz in swift_render"
 fi
 
 # Step 3: Retag the ELF ABI from O32 to O64.
