@@ -159,6 +159,70 @@ entry:
 ; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
 declare { i32, i1 } @llvm.sadd.with.overflow.i32(i32, i32) #5
 
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define hidden void @stage0_init() local_unnamed_addr #0 {
+entry:
+  ret void
+}
+
+; Function Attrs: nounwind
+define hidden void @stage0_loop(i32 signext %0) local_unnamed_addr #3 {
+entry:
+  %1 = icmp slt i32 %0, 1
+  br i1 %1, label %2, label %14
+
+2:                                                ; preds = %entry
+  %3 = load i32, ptr @current_task, align 4
+  %4 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %3, i32 1)
+  %5 = extractvalue { i32, i1 } %4, 1
+  br i1 %5, label %6, label %7, !prof !13
+
+6:                                                ; preds = %2
+  tail call void @llvm.trap() #16
+  unreachable
+
+7:                                                ; preds = %2
+  %8 = extractvalue { i32, i1 } %4, 0
+  %9 = srem i32 %8, 2
+  store i32 %9, ptr @current_task, align 4
+  %display_list.i.i = getelementptr inbounds [2 x %struct.GfxTask], ptr @gfx_tasks, i32 0, i32 %9, i32 3
+  %10 = ptrtoint ptr %display_list.i.i to i32
+  %incdec.ptr.i.i = getelementptr inbounds nuw i8, ptr %display_list.i.i, i32 8
+  store i32 -620363776, ptr %display_list.i.i, align 8, !tbaa !10
+  %w1.i.i = getelementptr inbounds nuw i8, ptr %display_list.i.i, i32 4
+  store i32 0, ptr %w1.i.i, align 4, !tbaa !10
+  %incdec.ptr.i1.i = getelementptr inbounds nuw i8, ptr %display_list.i.i, i32 16
+  store i32 -570425344, ptr %incdec.ptr.i.i, align 8, !tbaa !10
+  %w1.i2.i = getelementptr inbounds nuw i8, ptr %display_list.i.i, i32 12
+  store i32 ptrtoint (ptr getelementptr inbounds (i8, ptr @gfx_setup_rspstate, i32 -2147483648) to i32), ptr %w1.i2.i, align 4, !tbaa !10
+  %incdec.ptr.i3.i = getelementptr inbounds nuw i8, ptr %display_list.i.i, i32 24
+  store ptr %incdec.ptr.i3.i, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -570425344, ptr %incdec.ptr.i1.i, align 8, !tbaa !10
+  %w1.i4.i = getelementptr inbounds nuw i8, ptr %display_list.i.i, i32 20
+  store i32 ptrtoint (ptr getelementptr inbounds (i8, ptr @gfx_setup_rdpstate, i32 -2147483648) to i32), ptr %w1.i4.i, align 4, !tbaa !10
+  tail call void @gfx_clear_cfb()
+  %11 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i = getelementptr inbounds nuw i8, ptr %11, i32 8
+  store ptr %incdec.ptr.i, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -385875968, ptr %11, align 8, !tbaa !10
+  %w1.i = getelementptr inbounds nuw i8, ptr %11, i32 4
+  store i32 0, ptr %w1.i, align 4, !tbaa !10
+  %12 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i1 = getelementptr inbounds nuw i8, ptr %12, i32 8
+  store ptr %incdec.ptr.i1, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -553648128, ptr %12, align 8, !tbaa !10
+  %w1.i2 = getelementptr inbounds nuw i8, ptr %12, i32 4
+  store i32 0, ptr %w1.i2, align 4, !tbaa !10
+  %13 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %sub.ptr.lhs.cast.i = ptrtoint ptr %13 to i32
+  %sub.ptr.sub.i = sub i32 %sub.ptr.lhs.cast.i, %10
+  tail call void @nuGfxTaskStart(ptr noundef nonnull %display_list.i.i, i32 noundef signext %sub.ptr.sub.i, i32 noundef signext 0, i32 noundef signext 1) #15
+  br label %14
+
+14:                                               ; preds = %entry, %7
+  ret void
+}
+
 ; Function Attrs: nounwind sspreq
 define weak_odr protected { ptr, ptr } @swift_allocBox(ptr %0) local_unnamed_addr #6 {
 entry:
@@ -1402,6 +1466,9 @@ switch.lookup:                                    ; preds = %4, %entry, %2, %11,
 
 ; Function Attrs: optsize
 declare i32 @osVirtualToPhysical(ptr noundef) local_unnamed_addr #11
+
+; Function Attrs: optsize
+declare void @nuGfxTaskStart(ptr noundef, i32 noundef signext, i32 noundef signext, i32 noundef signext) local_unnamed_addr #11
 
 ; Function Attrs: inlinehint nounwind optsize
 define internal void @_swift_embedded_error_box_destroy(ptr noundef %object) #12 {

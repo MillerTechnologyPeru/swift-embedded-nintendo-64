@@ -2,6 +2,8 @@
 
 #include <nusys.h>
 #include "gfx.h"
+#include "stage0.h"
+#include "stage1.h"
 
 #define MAX_GFX_TASKS 2
 
@@ -77,4 +79,22 @@ static inline void dl_dp_fill_rectangle(int x0, int y0, int x1, int y1) {
 
 static inline void dl_dp_pipe_sync(void) {
     gDPPipeSync(gfx_list_ptr++);
+}
+
+static inline void dl_dp_full_sync(void) {
+    gDPFullSync(gfx_list_ptr++);
+}
+
+static inline void dl_sp_end_display_list(void) {
+    gSPEndDisplayList(gfx_list_ptr++);
+}
+
+// Submit the current display list as a standard render task and swap buffers.
+static inline void gfx_task_submit(GfxTask *task) {
+    nuGfxTaskStart(
+        task->display_list,
+        (s32)(gfx_list_ptr - task->display_list) * sizeof(Gfx),
+        NU_GFX_UCODE_F3DEX,
+        NU_SC_SWAPBUFFER
+    );
 }
