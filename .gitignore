@@ -39,6 +39,7 @@ playground.xcworkspace
 # N64 SDK headers extracted from the Docker image for the host Swift compile
 # (regenerated automatically by compile-swift.sh)
 n64-headers/
+*/build/*
 
 # CocoaPods
 #
