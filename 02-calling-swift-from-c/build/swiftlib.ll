@@ -3,15 +3,19 @@ source_filename = "build/swiftlib.ll"
 target datalayout = "E-m:m-p:32:32-i8:8:32-i16:16:32-i64:64-n32-S64"
 target triple = "mips-none-none-elf"
 
+%TSf = type <{ float }>
 %TSi = type <{ i32 }>
 %TSb = type <{ i1 }>
 %swift.function = type { ptr, ptr }
 %union.Gfx = type { i64 }
 %struct.GfxTask = type { %union.Mtx, %union.Mtx, [10 x %union.Mtx], [2048 x %union.Gfx] }
 %union.Mtx = type { i64, [56 x i8] }
+%union.Vtx = type { i64, [8 x i8] }
 %TSvSg = type <{ [4 x i8] }>
 %TSu = type <{ i32 }>
 
+@"$e8SwiftLib15boxRotationRoll33_02A225CDF1921CC00416754ABF7AFFC4LLSfvp" = protected local_unnamed_addr global %TSf zeroinitializer, align 4
+@"$e8SwiftLib16boxRotationPitch33_02A225CDF1921CC00416754ABF7AFFC4LLSfvp" = protected local_unnamed_addr global %TSf zeroinitializer, align 4
 @current_task = external local_unnamed_addr global i32, align 4
 @gfx_list_ptr = external local_unnamed_addr global ptr, align 4
 @"$es16_emptyBoxStorageSi_Sitvp" = linkonce_odr protected global <{ %TSi, %TSi }> <{ %TSi zeroinitializer, %TSi <{ i32 -1 }> }>, align 4
@@ -23,6 +27,7 @@ target triple = "mips-none-none-elf"
 @nuGfxZBuffer = external local_unnamed_addr global ptr, align 4
 @nuGfxCfb_ptr = external local_unnamed_addr global ptr, align 4
 @gfx_tasks = external global [2 x %struct.GfxTask], align 8
+@square_verts = external global [0 x %union.Vtx], align 8
 @_swift1_autolink_entries = private constant [0 x i8] zeroinitializer, section ".swift1_autolink_entries", no_sanitize_address, align 4
 @llvm.used = appending global [3 x ptr] [ptr @_swift1_autolink_entries, ptr @_swift_exceptionPersonality, ptr @_swift_fatalError], section "llvm.metadata"
 
@@ -223,8 +228,201 @@ entry:
   ret void
 }
 
+; Function Attrs: nounwind
+define protected void @"$e8SwiftLib11stage1_draw33_02A225CDF1921CC00416754ABF7AFFC4LLyyF"() local_unnamed_addr #3 {
+entry:
+  %0 = load i32, ptr @current_task, align 4
+  %1 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %0, i32 1)
+  %2 = extractvalue { i32, i1 } %1, 1
+  br i1 %2, label %3, label %4, !prof !13
+
+3:                                                ; preds = %entry
+  tail call void @llvm.trap() #16
+  unreachable
+
+4:                                                ; preds = %entry
+  %5 = extractvalue { i32, i1 } %1, 0
+  %6 = srem i32 %5, 2
+  store i32 %6, ptr @current_task, align 4
+  %arrayidx.i.i = getelementptr inbounds [2 x %struct.GfxTask], ptr @gfx_tasks, i32 0, i32 %6
+  %display_list.i.i = getelementptr inbounds nuw i8, ptr %arrayidx.i.i, i32 768
+  %7 = ptrtoint ptr %display_list.i.i to i32
+  %incdec.ptr.i.i = getelementptr inbounds nuw i8, ptr %arrayidx.i.i, i32 776
+  store i32 -620363776, ptr %display_list.i.i, align 8, !tbaa !10
+  %w1.i.i = getelementptr inbounds nuw i8, ptr %arrayidx.i.i, i32 772
+  store i32 0, ptr %w1.i.i, align 4, !tbaa !10
+  %incdec.ptr.i1.i = getelementptr inbounds nuw i8, ptr %arrayidx.i.i, i32 784
+  store i32 -570425344, ptr %incdec.ptr.i.i, align 8, !tbaa !10
+  %w1.i2.i = getelementptr inbounds nuw i8, ptr %arrayidx.i.i, i32 780
+  store i32 ptrtoint (ptr getelementptr inbounds (i8, ptr @gfx_setup_rspstate, i32 -2147483648) to i32), ptr %w1.i2.i, align 4, !tbaa !10
+  %incdec.ptr.i3.i = getelementptr inbounds nuw i8, ptr %arrayidx.i.i, i32 792
+  store ptr %incdec.ptr.i3.i, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -570425344, ptr %incdec.ptr.i1.i, align 8, !tbaa !10
+  %w1.i4.i = getelementptr inbounds nuw i8, ptr %arrayidx.i.i, i32 788
+  store i32 ptrtoint (ptr getelementptr inbounds (i8, ptr @gfx_setup_rdpstate, i32 -2147483648) to i32), ptr %w1.i4.i, align 4, !tbaa !10
+  tail call void @gfx_clear_cfb()
+  %8 = tail call zeroext i16 @stage1_setup_projection(ptr nonnull %arrayidx.i.i) #17
+  %9 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i = getelementptr inbounds nuw i8, ptr %9, i32 8
+  store ptr %incdec.ptr.i, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -619839488, ptr %9, align 8, !tbaa !10
+  %conv.i = zext i16 %8 to i32
+  %w1.i = getelementptr inbounds nuw i8, ptr %9, i32 4
+  store i32 %conv.i, ptr %w1.i, align 4, !tbaa !10
+  tail call void @stage1_setup_modelview(ptr nonnull %arrayidx.i.i) #17
+  %10 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i1 = getelementptr inbounds nuw i8, ptr %10, i32 8
+  store ptr %incdec.ptr.i1, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -633864185, ptr %10, align 8, !tbaa !10
+  %add.ptr.i = getelementptr inbounds i8, ptr %arrayidx.i.i, i32 -2147483648
+  %11 = ptrtoint ptr %add.ptr.i to i32
+  %w1.i2 = getelementptr inbounds nuw i8, ptr %10, i32 4
+  store i32 %11, ptr %w1.i2, align 4, !tbaa !10
+  %12 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i3 = getelementptr inbounds nuw i8, ptr %12, i32 8
+  store ptr %incdec.ptr.i3, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -633864189, ptr %12, align 8, !tbaa !10
+  %add.ptr.i4 = getelementptr inbounds i8, ptr %arrayidx.i.i, i32 -2147483584
+  %13 = ptrtoint ptr %add.ptr.i4 to i32
+  %w1.i5 = getelementptr inbounds nuw i8, ptr %12, i32 4
+  store i32 %13, ptr %w1.i5, align 4, !tbaa !10
+  %14 = load i32, ptr @"$e8SwiftLib15boxRotationRoll33_02A225CDF1921CC00416754ABF7AFFC4LLSfvp", align 4
+  %15 = load i32, ptr @"$e8SwiftLib16boxRotationPitch33_02A225CDF1921CC00416754ABF7AFFC4LLSfvp", align 4
+  tail call void @stage1_setup_object_transform(ptr nonnull %arrayidx.i.i, i32 zeroext %14, i32 zeroext %15) #17
+  %16 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i6 = getelementptr inbounds nuw i8, ptr %16, i32 8
+  store ptr %incdec.ptr.i6, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -633864192, ptr %16, align 8, !tbaa !10
+  %add.ptr.i7 = getelementptr inbounds i8, ptr %arrayidx.i.i, i32 -2147483520
+  %17 = ptrtoint ptr %add.ptr.i7 to i32
+  %w1.i8 = getelementptr inbounds nuw i8, ptr %16, i32 4
+  store i32 %17, ptr %w1.i8, align 4, !tbaa !10
+  %18 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i9 = getelementptr inbounds nuw i8, ptr %18, i32 8
+  store ptr %incdec.ptr.i9, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 16810000, ptr %18, align 8, !tbaa !10
+  %w1.i10 = getelementptr inbounds nuw i8, ptr %18, i32 4
+  store i32 ptrtoint (ptr @square_verts to i32), ptr %w1.i10, align 4, !tbaa !10
+  %19 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i11 = getelementptr inbounds nuw i8, ptr %19, i32 8
+  store ptr %incdec.ptr.i11, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -486536703, ptr %19, align 8, !tbaa !10
+  %w1.i12 = getelementptr inbounds nuw i8, ptr %19, i32 4
+  store i32 0, ptr %w1.i12, align 4, !tbaa !10
+  %20 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i13 = getelementptr inbounds nuw i8, ptr %20, i32 8
+  store ptr %incdec.ptr.i13, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -503316452, ptr %20, align 8, !tbaa !10
+  %w1.i14 = getelementptr inbounds nuw i8, ptr %20, i32 4
+  store i32 5578872, ptr %w1.i14, align 4, !tbaa !10
+  %21 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i15 = getelementptr inbounds nuw i8, ptr %21, i32 8
+  store ptr %incdec.ptr.i15, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -654311424, ptr %21, align 8, !tbaa !10
+  %w1.i16 = getelementptr inbounds nuw i8, ptr %21, i32 4
+  store i32 0, ptr %w1.i16, align 4, !tbaa !10
+  %22 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i17 = getelementptr inbounds nuw i8, ptr %22, i32 8
+  store ptr %incdec.ptr.i17, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -637534209, ptr %22, align 8, !tbaa !10
+  %w1.i18 = getelementptr inbounds nuw i8, ptr %22, i32 4
+  store i32 2097157, ptr %w1.i18, align 4, !tbaa !10
+  %23 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i19 = getelementptr inbounds nuw i8, ptr %23, i32 8
+  store ptr %incdec.ptr.i19, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 100663812, ptr %23, align 8, !tbaa !10
+  %w1.i20 = getelementptr inbounds nuw i8, ptr %23, i32 4
+  store i32 1030, ptr %w1.i20, align 4, !tbaa !10
+  %24 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i21 = getelementptr inbounds nuw i8, ptr %24, i32 8
+  store ptr %incdec.ptr.i21, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 101583368, ptr %24, align 8, !tbaa !10
+  %w1.i22 = getelementptr inbounds nuw i8, ptr %24, i32 4
+  store i32 789006, ptr %w1.i22, align 4, !tbaa !10
+  %25 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i23 = getelementptr inbounds nuw i8, ptr %25, i32 8
+  store ptr %incdec.ptr.i23, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 100797450, ptr %25, align 8, !tbaa !10
+  %w1.i24 = getelementptr inbounds nuw i8, ptr %25, i32 4
+  store i32 265218, ptr %w1.i24, align 4, !tbaa !10
+  %26 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i25 = getelementptr inbounds nuw i8, ptr %26, i32 8
+  store ptr %incdec.ptr.i25, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 100666886, ptr %26, align 8, !tbaa !10
+  %w1.i26 = getelementptr inbounds nuw i8, ptr %26, i32 4
+  store i32 2062, ptr %w1.i26, align 4, !tbaa !10
+  %27 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i27 = getelementptr inbounds nuw i8, ptr %27, i32 8
+  store ptr %incdec.ptr.i27, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -419430400, ptr %27, align 8, !tbaa !10
+  %w1.i28 = getelementptr inbounds nuw i8, ptr %27, i32 4
+  store i32 0, ptr %w1.i28, align 4, !tbaa !10
+  %28 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i29 = getelementptr inbounds nuw i8, ptr %28, i32 8
+  store ptr %incdec.ptr.i29, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -667418622, ptr %28, align 8, !tbaa !10
+  %w1.i30 = getelementptr inbounds nuw i8, ptr %28, i32 4
+  store i32 64, ptr %w1.i30, align 4, !tbaa !10
+  %29 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i31 = getelementptr inbounds nuw i8, ptr %29, i32 8
+  store ptr %incdec.ptr.i31, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -385875968, ptr %29, align 8, !tbaa !10
+  %w1.i32 = getelementptr inbounds nuw i8, ptr %29, i32 4
+  store i32 0, ptr %w1.i32, align 4, !tbaa !10
+  %30 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %incdec.ptr.i33 = getelementptr inbounds nuw i8, ptr %30, i32 8
+  store ptr %incdec.ptr.i33, ptr @gfx_list_ptr, align 4, !tbaa !6
+  store i32 -553648128, ptr %30, align 8, !tbaa !10
+  %w1.i34 = getelementptr inbounds nuw i8, ptr %30, i32 4
+  store i32 0, ptr %w1.i34, align 4, !tbaa !10
+  %31 = load ptr, ptr @gfx_list_ptr, align 4, !tbaa !6
+  %sub.ptr.lhs.cast.i = ptrtoint ptr %31 to i32
+  %sub.ptr.sub.i = sub i32 %sub.ptr.lhs.cast.i, %7
+  tail call void @nuGfxTaskStart(ptr noundef nonnull %display_list.i.i, i32 noundef signext %sub.ptr.sub.i, i32 noundef signext 0, i32 noundef signext 1) #15
+  ret void
+}
+
+; Function Attrs: optsize
+declare zeroext i16 @stage1_setup_projection(ptr noundef) local_unnamed_addr #6
+
+; Function Attrs: optsize
+declare void @stage1_setup_modelview(ptr noundef) local_unnamed_addr #6
+
+; Function Attrs: optsize
+declare void @stage1_setup_object_transform(ptr noundef, i32 noundef signext, i32 noundef signext) local_unnamed_addr #6
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define hidden void @stage1_init() local_unnamed_addr #0 {
+entry:
+  ret void
+}
+
+; Function Attrs: nounwind
+define hidden void @stage1_loop(i32 signext %0) local_unnamed_addr #3 {
+entry:
+  %1 = icmp slt i32 %0, 1
+  br i1 %1, label %2, label %3
+
+2:                                                ; preds = %entry
+  tail call void @"$e8SwiftLib11stage1_draw33_02A225CDF1921CC00416754ABF7AFFC4LLyyF"()
+  br label %3
+
+3:                                                ; preds = %entry, %2
+  %4 = load float, ptr @"$e8SwiftLib15boxRotationRoll33_02A225CDF1921CC00416754ABF7AFFC4LLSfvp", align 4
+  %5 = fadd float %4, 1.000000e+00
+  %6 = fcmp ogt float %5, 3.600000e+02
+  %storemerge = select i1 %6, float 0.000000e+00, float %5
+  store float %storemerge, ptr @"$e8SwiftLib15boxRotationRoll33_02A225CDF1921CC00416754ABF7AFFC4LLSfvp", align 4
+  %7 = load float, ptr @"$e8SwiftLib16boxRotationPitch33_02A225CDF1921CC00416754ABF7AFFC4LLSfvp", align 4
+  %8 = fadd float %7, 5.000000e-01
+  %9 = fcmp ogt float %8, 3.600000e+02
+  %storemerge1 = select i1 %9, float 0.000000e+00, float %8
+  store float %storemerge1, ptr @"$e8SwiftLib16boxRotationPitch33_02A225CDF1921CC00416754ABF7AFFC4LLSfvp", align 4
+  ret void
+}
+
 ; Function Attrs: nounwind sspreq
-define weak_odr protected { ptr, ptr } @swift_allocBox(ptr %0) local_unnamed_addr #6 {
+define weak_odr protected { ptr, ptr } @swift_allocBox(ptr %0) local_unnamed_addr #7 {
 entry:
   %1 = alloca %TSvSg, align 4
   %arrayidx.i.i = getelementptr inbounds i8, ptr %0, i32 -4
@@ -278,13 +476,13 @@ entry:
 declare { i32, i1 } @llvm.ssub.with.overflow.i32(i32, i32) #5
 
 ; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite)
-declare void @llvm.lifetime.start.p0(i64 immarg, ptr captures(none)) #7
+declare void @llvm.lifetime.start.p0(i64 immarg, ptr captures(none)) #8
 
 ; Function Attrs: nofree nounwind
-declare i32 @posix_memalign(ptr, i32 signext, i32 signext) local_unnamed_addr #8
+declare i32 @posix_memalign(ptr, i32 signext, i32 signext) local_unnamed_addr #9
 
 ; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite)
-declare void @llvm.lifetime.end.p0(i64 immarg, ptr captures(none)) #7
+declare void @llvm.lifetime.end.p0(i64 immarg, ptr captures(none)) #8
 
 ; Function Attrs: nounwind
 define weak_odr protected { ptr, ptr } @swift_makeBoxUnique(ptr %0, ptr %1, i32 %2) local_unnamed_addr #3 {
@@ -396,7 +594,7 @@ entry:
 }
 
 ; Function Attrs: mustprogress nounwind willreturn allockind("free") memory(argmem: readwrite, inaccessiblemem: readwrite)
-declare void @free(ptr allocptr noundef captures(none)) local_unnamed_addr #9
+declare void @free(ptr allocptr noundef captures(none)) local_unnamed_addr #10
 
 ; Function Attrs: nounwind
 define weak_odr protected ptr @swift_allocEmptyBox() local_unnamed_addr #3 {
@@ -415,7 +613,7 @@ entry:
 }
 
 ; Function Attrs: nounwind sspreq
-define weak_odr protected ptr @swift_allocObject(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #6 {
+define weak_odr protected ptr @swift_allocObject(ptr %0, i32 signext %1, i32 signext %2) local_unnamed_addr #7 {
 entry:
   %3 = alloca %TSvSg, align 4
   %4 = icmp eq i32 %2, -1
@@ -458,7 +656,7 @@ entry:
 }
 
 ; Function Attrs: nounwind sspreq
-define weak_odr protected ptr @swift_allocObjectTyped(ptr %0, i32 signext %1, i32 signext %2, i64 zeroext %3) local_unnamed_addr #6 {
+define weak_odr protected ptr @swift_allocObjectTyped(ptr %0, i32 signext %1, i32 signext %2, i64 zeroext %3) local_unnamed_addr #7 {
 entry:
   %4 = alloca %TSvSg, align 4
   %5 = icmp eq i32 %2, -1
@@ -572,7 +770,7 @@ _swift_embedded_invoke_heap_object_optional_ivardestroyer.exit._crit_edge: ; pre
 }
 
 ; Function Attrs: nounwind sspreq
-define weak_odr protected ptr @swift_slowAlloc(i32 signext %0, i32 signext %1) local_unnamed_addr #6 {
+define weak_odr protected ptr @swift_slowAlloc(i32 signext %0, i32 signext %1) local_unnamed_addr #7 {
 entry:
   %2 = alloca %TSvSg, align 4
   %3 = icmp eq i32 %1, -1
@@ -1100,7 +1298,7 @@ entry:
 }
 
 ; Function Attrs: nounwind sspreq
-define weak_odr protected ptr @swift_coroFrameAlloc(i32 signext %0, i64 zeroext %1) local_unnamed_addr #6 {
+define weak_odr protected ptr @swift_coroFrameAlloc(i32 signext %0, i64 zeroext %1) local_unnamed_addr #7 {
 entry:
   %2 = alloca %TSvSg, align 4
   call void @llvm.lifetime.start.p0(i64 4, ptr nonnull %2)
@@ -1120,7 +1318,7 @@ entry:
 }
 
 ; Function Attrs: nounwind sspreq
-define weak_odr protected { ptr, ptr } @swift_allocError(ptr %0, ptr %1, ptr %2, i1 %3) local_unnamed_addr #6 {
+define weak_odr protected { ptr, ptr } @swift_allocError(ptr %0, ptr %1, ptr %2, i1 %3) local_unnamed_addr #7 {
 entry:
   %4 = alloca %TSvSg, align 4
   %arrayidx.i.i = getelementptr inbounds i8, ptr %0, i32 -4
@@ -1383,7 +1581,7 @@ entry:
 }
 
 ; Function Attrs: noinline nounwind
-define weak_odr protected void @swift_clearSensitive(ptr %0, i32 signext %1) local_unnamed_addr #10 {
+define weak_odr protected void @swift_clearSensitive(ptr %0, i32 signext %1) local_unnamed_addr #11 {
 entry:
   %2 = icmp slt i32 %1, 0
   br i1 %2, label %5, label %3, !prof !13
@@ -1465,10 +1663,10 @@ switch.lookup:                                    ; preds = %4, %entry, %2, %11,
 }
 
 ; Function Attrs: optsize
-declare i32 @osVirtualToPhysical(ptr noundef) local_unnamed_addr #11
+declare i32 @osVirtualToPhysical(ptr noundef) local_unnamed_addr #6
 
 ; Function Attrs: optsize
-declare void @nuGfxTaskStart(ptr noundef, i32 noundef signext, i32 noundef signext, i32 noundef signext) local_unnamed_addr #11
+declare void @nuGfxTaskStart(ptr noundef, i32 noundef signext, i32 noundef signext, i32 noundef signext) local_unnamed_addr #6
 
 ; Function Attrs: inlinehint nounwind optsize
 define internal void @_swift_embedded_error_box_destroy(ptr noundef %object) #12 {
@@ -1617,12 +1815,12 @@ attributes #2 = { cold noreturn nounwind memory(inaccessiblemem: write) }
 attributes #3 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
 attributes #4 = { nounwind memory(readwrite, argmem: none, inaccessiblemem: write) "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
 attributes #5 = { mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none) }
-attributes #6 = { nounwind sspreq "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
-attributes #7 = { mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite) }
-attributes #8 = { nofree nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
-attributes #9 = { mustprogress nounwind willreturn allockind("free") memory(argmem: readwrite, inaccessiblemem: readwrite) "alloc-family"="malloc" "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
-attributes #10 = { noinline nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
-attributes #11 = { optsize "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #6 = { optsize "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #7 = { nounwind sspreq "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #8 = { mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite) }
+attributes #9 = { nofree nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #10 = { mustprogress nounwind willreturn allockind("free") memory(argmem: readwrite, inaccessiblemem: readwrite) "alloc-family"="malloc" "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #11 = { noinline nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
 attributes #12 = { inlinehint nounwind optsize "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
 attributes #13 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
 attributes #14 = { nocallback nofree nounwind willreturn memory(argmem: write) }

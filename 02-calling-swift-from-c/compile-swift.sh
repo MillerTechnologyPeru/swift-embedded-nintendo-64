@@ -54,7 +54,7 @@ echo "Step 1: Emitting LLVM IR..."
     -emit-ir \
     -module-name SwiftLib \
     -o "$BUILD_DIR/swiftlib.ll" \
-    src/lib.swift src/gfx.swift src/stage0.swift 2>&1
+    src/lib.swift src/gfx.swift src/stage0.swift src/stage1.swift 2>&1
 
 if [ ! -f "$BUILD_DIR/swiftlib.ll" ]; then
     echo "Failed to emit LLVM IR"
