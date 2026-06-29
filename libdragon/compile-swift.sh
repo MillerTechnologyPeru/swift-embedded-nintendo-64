@@ -1,25 +1,49 @@
 #!/bin/bash
 
-# Compile the Swift sources to a MIPS object on the host, the same way as
-# example 02: emit LLVM IR with embedded Swift, then lower with llc using a
-# non-abicalls big-endian MIPS configuration that the N64 linker accepts.
+# Compile the Swift sources to a MIPS object on the host: emit LLVM IR with
+# embedded Swift, then lower with llc using a non-abicalls big-endian MIPS
+# configuration that the N64 linker accepts.
 #
 # Swift only imports src/render_bridge.h (plain stdint declarations), so unlike
 # example 02 we do NOT need libdragon's headers on the host.
+#
+# NOTE: conditionals (if/ternary/min/max) must NOT appear in Swift code that
+# crosses LLVM codegen: LLVM emits movn/movz (MIPS IV) for select IR, and the
+# VR4300 is MIPS III — those opcodes raise Reserved Instruction at runtime.
+# Move any such logic to render_bridge.c, compiled by the libdragon GCC.
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-SWIFTC="${SWIFTC:-/Volumes/Crucial-2TB/Developer/build/Ninja-ReleaseAssert/swift-macosx-arm64/bin/swiftc}"
-LLC="${LLC:-/Volumes/Crucial-2TB/Developer/build/Ninja-ReleaseAssert/llvm-macosx-arm64/bin/llc}"
-BUILD_DIR="${BUILD_DIR:-build}"
+# Prefer a custom MIPS-enabled swiftc; fall back to whatever swiftc is on PATH.
+DEFAULT_SWIFTC="/Volumes/Crucial-2TB/Developer/build/Ninja-ReleaseAssert/swift-macosx-arm64/bin/swiftc"
+SWIFTC="${SWIFTC:-$DEFAULT_SWIFTC}"
+if [ ! -x "$SWIFTC" ]; then
+    SWIFTC="$(which swiftc)"
+fi
 
+# Prefer the matching llc; fall back to Homebrew LLVM.
+DEFAULT_LLC="/Volumes/Crucial-2TB/Developer/build/Ninja-ReleaseAssert/llvm-macosx-arm64/bin/llc"
+LLC="${LLC:-$DEFAULT_LLC}"
+if [ ! -x "$LLC" ]; then
+    LLC="/opt/homebrew/Cellar/llvm/22.1.7_1/bin/llc"
+fi
+if [ ! -x "$LLC" ]; then
+    LLC="$(which llc 2>/dev/null || echo '')"
+fi
+if [ -z "$LLC" ] || [ ! -x "$LLC" ]; then
+    echo "✗ No llc found. Set LLC= or install LLVM via homebrew."
+    exit 1
+fi
+
+BUILD_DIR="${BUILD_DIR:-build}"
 mkdir -p "$BUILD_DIR"
 
 echo "Compiling Swift code with host compiler..."
 echo "Swift compiler: $SWIFTC"
+echo "LLC:            $LLC"
 echo "Target: mips-none-none-elf"
 
 # Step 1: Emit LLVM IR from Swift
@@ -36,11 +60,11 @@ echo "Step 1: Emitting LLVM IR..."
     src/render.swift 2>&1
 
 if [ ! -f "$BUILD_DIR/swiftlib.ll" ]; then
-    echo "Failed to emit LLVM IR"
+    echo "✗ Failed to emit LLVM IR"
     exit 1
 fi
 
-# Step 2: Lower IR to a non-abicalls MIPS object
+# Step 2: Lower IR to a non-abicalls MIPS object.
 echo "Step 2: Compiling IR to object file with llc (non-abicalls)..."
 "$LLC" \
     -mtriple=mips-none-none-elf \
@@ -54,6 +78,25 @@ echo "Step 2: Compiling IR to object file with llc (non-abicalls)..."
 if [ ! -f "$BUILD_DIR/swiftlib.o" ]; then
     echo "✗ Swift compilation failed"
     exit 1
+fi
+
+# Verify no movn/movz (MIPS IV conditional moves) slipped into reachable code.
+# The VR4300 is MIPS III and will raise Reserved Instruction on these.
+# Swift emits dead runtime support functions (swift_allocBox, swift_allocObject,
+# etc.) that also contain movn/movz — those are never called and the linker's
+# --gc-sections will drop them, so we only check the first (application) symbol.
+OBJDUMP_BIN="$(command -v llvm-objdump 2>/dev/null || true)"
+if [ -n "$OBJDUMP_BIN" ]; then
+    # Disassemble only swift_render (first symbol; ends before swift_allocBox)
+    COUNT=$("$OBJDUMP_BIN" -d --disassemble-symbols=swift_render "$BUILD_DIR/swiftlib.o" 2>/dev/null \
+            | grep -icE '\bmovn\b|\bmovz\b' || true)
+    if [ "$COUNT" -gt 0 ]; then
+        echo "✗ $COUNT movn/movz instruction(s) in swift_render — move the generating Swift code to C."
+        "$OBJDUMP_BIN" -d --disassemble-symbols=swift_render "$BUILD_DIR/swiftlib.o" 2>/dev/null \
+            | grep -iE '\bmovn\b|\bmovz\b'
+        exit 1
+    fi
+    echo "  ✓ No movn/movz in swift_render"
 fi
 
 # Step 3: Retag the ELF ABI from O32 to O64.
@@ -74,7 +117,6 @@ with open(path, "r+b") as f:
     data = bytearray(f.read())
     assert data[:4] == b"\x7fELF", "not an ELF file"
     assert data[5] == 2, "expected big-endian (EI_DATA=2)"   # N64 is MSB
-    # ELF32 e_flags is a 4-byte big-endian field at offset 0x24.
     off = 0x24
     flags = struct.unpack(">I", data[off:off+4])[0]
     new = (flags & ~0x00001100) | 0x00002000  # clear O32(0x1000)+32bitmode(0x100), set O64(0x2000)

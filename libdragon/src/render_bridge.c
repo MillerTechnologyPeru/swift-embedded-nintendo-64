@@ -27,3 +27,18 @@ int bridge_screen_width(void) {
 int bridge_screen_height(void) {
     return display_get_height();
 }
+
+int bridge_abs(int v) {
+    return v < 0 ? -v : v;
+}
+
+uint8_t bridge_clamp(int v) {
+    if (v < 0) return 0;
+    if (v > 255) return 255;
+    return (uint8_t)v;
+}
+
+int bridge_cell_edge(int x0, int cell_size, int total) {
+    int edge = x0 + cell_size - 1;
+    return edge < total ? edge : total - 1;
+}

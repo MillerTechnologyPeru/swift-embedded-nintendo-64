@@ -30,188 +30,137 @@ entry:
   %5 = shl i32 %0, 2
   %6 = add i32 %0, -536870912
   %7 = icmp ult i32 %6, -1073741824
-  br i1 %7, label %101, label %.preheader, !prof !6
+  br i1 %7, label %76, label %.preheader, !prof !6
 
-.preheader:                                       ; preds = %entry
-  %8 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %1, i32 -1)
-  %9 = extractvalue { i32, i1 } %8, 1
-  %10 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %2, i32 -1)
-  %11 = extractvalue { i32, i1 } %10, 1
-  br label %12
+.preheader:                                       ; preds = %entry, %73
+  %8 = phi i32 [ %74, %73 ], [ 0, %entry ]
+  %9 = tail call { i32, i1 } @llvm.smul.with.overflow.i32(i32 %8, i32 %4)
+  %10 = extractvalue { i32, i1 } %9, 0
+  %11 = extractvalue { i32, i1 } %9, 1
+  br i1 %11, label %77, label %12, !prof !6
 
-12:                                               ; preds = %.preheader, %98
-  %13 = phi i32 [ %99, %98 ], [ 0, %.preheader ]
-  %14 = tail call { i32, i1 } @llvm.smul.with.overflow.i32(i32 %13, i32 %4)
-  %15 = extractvalue { i32, i1 } %14, 1
-  br i1 %15, label %102, label %16, !prof !6
+12:                                               ; preds = %.preheader
+  %13 = and i32 %10, 65535
+  br label %14
 
-16:                                               ; preds = %12
-  %17 = extractvalue { i32, i1 } %14, 0
-  %18 = icmp eq i32 %13, 11
-  %19 = and i32 %17, 65535
-  %20 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %17, i32 %4)
-  %21 = extractvalue { i32, i1 } %20, 1
-  %22 = extractvalue { i32, i1 } %20, 0
-  %23 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %22, i32 -1)
-  %24 = extractvalue { i32, i1 } %23, 1
-  br label %25
+14:                                               ; preds = %54, %12
+  %15 = phi i32 [ 0, %12 ], [ %72, %54 ]
+  %16 = add nuw nsw i32 %15, %8
+  %17 = shl nsw i32 %16, 4
+  %18 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %17, i32 %5)
+  %19 = extractvalue { i32, i1 } %18, 1
+  br i1 %19, label %78, label %20, !prof !6
 
-25:                                               ; preds = %83, %16
-  %26 = phi i32 [ 0, %16 ], [ %97, %83 ]
-  %27 = add nuw nsw i32 %26, %13
-  %28 = shl nsw i32 %27, 4
-  %29 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %28, i32 %5)
-  %30 = extractvalue { i32, i1 } %29, 1
-  br i1 %30, label %103, label %31, !prof !6
+20:                                               ; preds = %14
+  %21 = extractvalue { i32, i1 } %18, 0
+  %22 = and i32 %21, 252
+  %23 = add nsw i32 %22, -128
+  %24 = tail call i32 @bridge_abs(i32 signext %23) #12
+  %25 = shl i32 %24, 1
+  %26 = add i32 %24, 1073741824
+  %27 = icmp slt i32 %26, 0
+  br i1 %27, label %79, label %28, !prof !6
 
-31:                                               ; preds = %25
-  %32 = extractvalue { i32, i1 } %29, 0
-  %33 = and i32 %32, 252
-  %34 = add nsw i32 %33, -128
-  %35 = icmp samesign ult i32 %33, 128
-  %36 = sub nuw nsw i32 128, %33
-  %37 = select i1 %35, i32 %36, i32 %34
-  %38 = add nsw i32 %33, -85
-  %39 = icmp samesign ult i32 %33, 85
-  %40 = sub nuw nsw i32 85, %33
-  %41 = select i1 %39, i32 %40, i32 %38
-  %.neg = mul nsw i32 %41, -3
-  %42 = add nsw i32 %.neg, 255
-  %43 = add nsw i32 %33, -170
-  %44 = icmp samesign ult i32 %33, 170
-  %45 = sub nuw nsw i32 170, %33
-  %46 = select i1 %44, i32 %45, i32 %43
-  %47 = icmp sgt i32 %37, 127
-  br i1 %47, label %63, label %66
+28:                                               ; preds = %20
+  %29 = add nsw i32 %22, -85
+  %30 = tail call i32 @bridge_abs(i32 signext %29) #12
+  %31 = tail call { i32, i1 } @llvm.smul.with.overflow.i32(i32 %30, i32 3)
+  %32 = extractvalue { i32, i1 } %31, 1
+  br i1 %32, label %80, label %33, !prof !6
 
-48:                                               ; preds = %66, %63, %57
-  %49 = phi i32 [ %62, %57 ], [ 0, %63 ], [ 0, %66 ]
-  %50 = phi i32 [ %58, %57 ], [ %., %63 ], [ %.16, %66 ]
-  %51 = phi i8 [ %59, %57 ], [ -1, %63 ], [ %67, %66 ]
-  %52 = tail call { i32, i1 } @llvm.smul.with.overflow.i32(i32 %26, i32 %3)
-  %53 = extractvalue { i32, i1 } %52, 0
-  %54 = extractvalue { i32, i1 } %52, 1
-  br i1 %54, label %104, label %55, !prof !6
+33:                                               ; preds = %28
+  %34 = extractvalue { i32, i1 } %31, 0
+  %35 = tail call { i32, i1 } @llvm.ssub.with.overflow.i32(i32 255, i32 %34)
+  %36 = extractvalue { i32, i1 } %35, 0
+  %37 = extractvalue { i32, i1 } %35, 1
+  br i1 %37, label %81, label %38, !prof !6
 
-55:                                               ; preds = %48
-  %56 = icmp eq i32 %26, 15
-  br i1 %56, label %70, label %71
+38:                                               ; preds = %33
+  %39 = add nsw i32 %22, -170
+  %40 = tail call i32 @bridge_abs(i32 signext %39) #12
+  %41 = tail call { i32, i1 } @llvm.smul.with.overflow.i32(i32 %40, i32 3)
+  %42 = extractvalue { i32, i1 } %41, 1
+  br i1 %42, label %82, label %43, !prof !6
 
-57:                                               ; preds = %66, %63
-  %58 = phi i32 [ %., %63 ], [ %.16, %66 ]
-  %59 = phi i8 [ -1, %63 ], [ %67, %66 ]
-  %60 = mul nsw i32 %46, 64768
-  %61 = add nsw i32 %60, 65280
-  %62 = and i32 %61, 64768
-  br label %48
+43:                                               ; preds = %38
+  %44 = extractvalue { i32, i1 } %41, 0
+  %45 = tail call { i32, i1 } @llvm.ssub.with.overflow.i32(i32 255, i32 %44)
+  %46 = extractvalue { i32, i1 } %45, 1
+  br i1 %46, label %83, label %47, !prof !6
 
-63:                                               ; preds = %31
-  %64 = icmp sgt i32 %41, 85
-  %65 = icmp sgt i32 %46, 85
-  %. = select i1 %64, i32 0, i32 %42
-  br i1 %65, label %48, label %57
+47:                                               ; preds = %43
+  %48 = extractvalue { i32, i1 } %45, 0
+  %49 = tail call zeroext i8 @bridge_clamp(i32 signext %25) #12
+  %50 = tail call zeroext i8 @bridge_clamp(i32 signext %36) #12
+  %51 = tail call zeroext i8 @bridge_clamp(i32 signext %48) #12
+  %52 = tail call { i32, i1 } @llvm.smul.with.overflow.i32(i32 %15, i32 %3)
+  %53 = extractvalue { i32, i1 } %52, 1
+  br i1 %53, label %84, label %54, !prof !6
 
-66:                                               ; preds = %31
-  %.tr = trunc nsw i32 %37 to i8
-  %67 = shl i8 %.tr, 1
-  %68 = icmp sgt i32 %41, 85
-  %69 = icmp sgt i32 %46, 85
-  %.16 = select i1 %68, i32 0, i32 %42
-  br i1 %69, label %48, label %57
+54:                                               ; preds = %47
+  %55 = extractvalue { i32, i1 } %52, 0
+  %56 = tail call i32 @bridge_cell_edge(i32 signext %55, i32 signext %3, i32 signext %1) #12
+  %57 = tail call i32 @bridge_cell_edge(i32 signext %10, i32 signext %4, i32 signext %2) #12
+  %58 = zext i8 %49 to i32
+  %59 = shl nuw i32 %58, 24
+  %60 = zext i8 %50 to i32
+  %61 = shl nuw nsw i32 %60, 16
+  %62 = or disjoint i32 %61, %59
+  %63 = zext i8 %51 to i32
+  %64 = shl nuw nsw i32 %63, 8
+  %65 = or disjoint i32 %62, %64
+  %66 = or disjoint i32 %65, 255
+  %67 = shl i32 %55, 16
+  %68 = or disjoint i32 %67, %13
+  %69 = shl i32 %56, 16
+  %70 = and i32 %57, 65535
+  %71 = or disjoint i32 %70, %69
+  tail call void @bridge_fill_rect(i32 zeroext %66, i32 zeroext %68, i32 zeroext %71) #12
+  %72 = add nuw nsw i32 %15, 1
+  %exitcond.not = icmp eq i32 %72, 16
+  br i1 %exitcond.not, label %73, label %14
 
-70:                                               ; preds = %55
-  br i1 %9, label %110, label %78, !prof !6
+73:                                               ; preds = %54
+  %74 = add nuw nsw i32 %8, 1
+  %exitcond2.not = icmp eq i32 %74, 12
+  br i1 %exitcond2.not, label %75, label %.preheader
 
-71:                                               ; preds = %55
-  %72 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %53, i32 %3)
-  %73 = extractvalue { i32, i1 } %72, 1
-  br i1 %73, label %105, label %74, !prof !6
-
-74:                                               ; preds = %71
-  %75 = extractvalue { i32, i1 } %72, 0
-  %76 = tail call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %75, i32 -1)
-  %77 = extractvalue { i32, i1 } %76, 1
-  br i1 %77, label %106, label %78, !prof !6
-
-78:                                               ; preds = %74, %70
-  %.pn = phi { i32, i1 } [ %8, %70 ], [ %76, %74 ]
-  %79 = extractvalue { i32, i1 } %.pn, 0
-  br i1 %18, label %80, label %81
-
-80:                                               ; preds = %78
-  br i1 %11, label %109, label %83, !prof !6
-
-81:                                               ; preds = %78
-  br i1 %21, label %107, label %82, !prof !6
-
-82:                                               ; preds = %81
-  br i1 %24, label %108, label %83, !prof !6
-
-83:                                               ; preds = %80, %82
-  %.pn14 = phi { i32, i1 } [ %10, %80 ], [ %23, %82 ]
-  %84 = extractvalue { i32, i1 } %.pn14, 0
-  %85 = zext i8 %51 to i32
-  %86 = shl nuw i32 %85, 24
-  %87 = shl nsw i32 %50, 16
-  %88 = and i32 %87, 16711680
-  %89 = or disjoint i32 %86, %88
-  %90 = or disjoint i32 %89, %49
-  %91 = or disjoint i32 %90, 255
-  %92 = shl i32 %53, 16
-  %93 = or disjoint i32 %92, %19
-  %94 = shl i32 %79, 16
-  %95 = and i32 %84, 65535
-  %96 = or disjoint i32 %95, %94
-  tail call void @bridge_fill_rect(i32 zeroext %91, i32 zeroext %93, i32 zeroext %96) #12
-  %97 = add nuw nsw i32 %26, 1
-  %exitcond.not = icmp eq i32 %97, 16
-  br i1 %exitcond.not, label %98, label %25
-
-98:                                               ; preds = %83
-  %99 = add nuw nsw i32 %13, 1
-  %exitcond15.not = icmp eq i32 %99, 12
-  br i1 %exitcond15.not, label %100, label %12
-
-100:                                              ; preds = %98
+75:                                               ; preds = %73
   ret void
 
-101:                                              ; preds = %entry
+76:                                               ; preds = %entry
   tail call void @llvm.trap() #13
   unreachable
 
-102:                                              ; preds = %12
+77:                                               ; preds = %.preheader
   tail call void @llvm.trap() #13
   unreachable
 
-103:                                              ; preds = %25
+78:                                               ; preds = %14
   tail call void @llvm.trap() #13
   unreachable
 
-104:                                              ; preds = %48
+79:                                               ; preds = %20
   tail call void @llvm.trap() #13
   unreachable
 
-105:                                              ; preds = %71
+80:                                               ; preds = %28
   tail call void @llvm.trap() #13
   unreachable
 
-106:                                              ; preds = %74
+81:                                               ; preds = %33
   tail call void @llvm.trap() #13
   unreachable
 
-107:                                              ; preds = %81
+82:                                               ; preds = %38
   tail call void @llvm.trap() #13
   unreachable
 
-108:                                              ; preds = %82
+83:                                               ; preds = %43
   tail call void @llvm.trap() #13
   unreachable
 
-109:                                              ; preds = %80
-  tail call void @llvm.trap() #13
-  unreachable
-
-110:                                              ; preds = %70
+84:                                               ; preds = %47
   tail call void @llvm.trap() #13
   unreachable
 }
@@ -230,6 +179,15 @@ declare i32 @bridge_screen_height() local_unnamed_addr #1
 
 ; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
 declare { i32, i1 } @llvm.smul.with.overflow.i32(i32, i32) #3
+
+; Function Attrs: optsize
+declare i32 @bridge_abs(i32 noundef signext) local_unnamed_addr #1
+
+; Function Attrs: optsize
+declare zeroext i8 @bridge_clamp(i32 noundef signext) local_unnamed_addr #1
+
+; Function Attrs: optsize
+declare i32 @bridge_cell_edge(i32 noundef signext, i32 noundef signext, i32 noundef signext) local_unnamed_addr #1
 
 ; Function Attrs: optsize
 declare void @bridge_fill_rect(i32 noundef signext, i32 noundef signext, i32 noundef signext) local_unnamed_addr #1
